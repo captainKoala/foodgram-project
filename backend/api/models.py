@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from users.models import User
@@ -28,16 +29,20 @@ class Tag(models.Model):
         verbose_name="Название",
         help_text="Введите тег",
         max_length=200,
+        unique=True,
     )
     color = models.CharField(
         verbose_name="Цвет",
-        help_text="Выберите цветовой код",
-        max_length=200
+        help_text="Выберите цветовой HEX-код (пример: #FF0033)",
+        max_length=200,
+        unique=True,
+        validators=[RegexValidator(regex=r"#[0-9a-fA-F]{6}")],
     )
     slug = models.SlugField(
         verbose_name="Slug",
         help_text="Введите slug",
         max_length=200,
+        unique=True,
     )
 
     class Meta:
@@ -90,11 +95,12 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         verbose_name="Теги",
-        help_text="Выберите теги"
+        help_text="Выберите теги",
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления (мин)",
-        help_text="Введите время приготовления в минутах"
+        help_text="Введите время приготовления в минутах",
+        validators=[MinValueValidator(limit_value=1)]
     )
 
     class Meta:
