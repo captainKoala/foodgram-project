@@ -3,13 +3,13 @@ from django.db import models
 
 
 class User(AbstractUser):
-    username_validator = UnicodeUsernameValidator()
     username = models.CharField(
         verbose_name="Имя пользователя",
         max_length=150,
         unique=True,
-        help_text='Введите имя пользователя (Только буквы, цифры и символы @/./+/-/_ )',
-        validators=[username_validator],
+        help_text='Введите имя пользователя '
+                  '(Только буквы, цифры и символы @/./+/-/_ )',
+        validators=[UnicodeUsernameValidator()],
         error_messages={
             'unique': "Пользователь с таким логином уже существует.",
         },
@@ -29,6 +29,7 @@ class User(AbstractUser):
     email = models.EmailField(
         verbose_name="E-mail",
         help_text="Введите адрес электронной почты",
+        max_length=254,
         unique=True,
         blank=False,
     )
