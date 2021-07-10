@@ -1,4 +1,5 @@
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Ingredient, Recipe, Tag
@@ -16,6 +17,7 @@ class IngredientViewSet(ModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    pagination_class = PageNumberPagination
 
 
 class TagViewSet(ModelViewSet):
