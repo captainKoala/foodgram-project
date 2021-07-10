@@ -1,6 +1,7 @@
 from rest_framework.serializers import SerializerMethodField, ModelSerializer
 
 from .models import Ingredient, RecipeIngredients, Recipe, Tag
+from api.models import User
 
 
 class IngredientSerializer(ModelSerializer):
@@ -28,8 +29,15 @@ class RecipeIngredientsSerializer(ModelSerializer):
         return obj.ingredient.measurement_unit
 
 
+class AuthorSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name", "email"]
+
+
 class RecipeSerializer(ModelSerializer):
     ingredients = RecipeIngredientsSerializer(many=True)
+    author = AuthorSerializer()
 
     class Meta:
         model = Recipe
