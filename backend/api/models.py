@@ -21,7 +21,7 @@ class Ingredient(models.Model):
         verbose_name_plural = "Ингредиенты"
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.measurement_unit})"
 
 
 class Tag(models.Model):
@@ -53,19 +53,6 @@ class Tag(models.Model):
         return self.name
 
 
-class RecipeIngredients(models.Model):
-    ingredient = models.ForeignKey(
-        Ingredient,
-        verbose_name="Ингредиент",
-        help_text="Добавьте ингредиент",
-        on_delete=models.CASCADE,
-    )
-    amount = models.FloatField(
-        verbose_name="Количество",
-        help_text="Введите количество"
-    )
-
-
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
@@ -81,16 +68,17 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name="Изображение",
         help_text="Добавьте изображение",
+        null=True,
     )
     text = models.TextField(
         verbose_name="Текстовое описание",
         help_text="Введите текстовое описание",
     )
     ingredients = models.ManyToManyField(
-        RecipeIngredients,
+        Ingredient,
         verbose_name="Ингридиенты",
         help_text="Выберите ингридиенты",
-        related_name="Рецепты",
+        through='RecipeIngredientsDetails',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -109,3 +97,25 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name[:30]
+
+
+class RecipeIngredientsDetails(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name="Рецепт",
+        help_text="Выберите рецепт",
+        on_delete=models.CASCADE,
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name="Ингредиент",
+        help_text="Добавьте ингредиент",
+        on_delete=models.CASCADE,
+    )
+    amount = models.FloatField(
+        verbose_name="Количество",
+        help_text="Введите количество"
+    )
+
+    def __str__(self):
+        return f"{self.recipe} - {self.ingredient}"

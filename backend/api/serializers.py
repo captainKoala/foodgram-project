@@ -1,32 +1,23 @@
-from rest_framework.serializers import SerializerMethodField, ModelSerializer
+from rest_framework.serializers import ReadOnlyField, ModelSerializer, SerializerMethodField
 
-from .models import Ingredient, RecipeIngredients, Recipe, Tag
+from .models import Ingredient, RecipeIngredientsDetails, Recipe, Tag
 from api.models import User
 
 
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ["name", "measurement_unit"]
-
-
-class RecipeIngredientsSerializer(ModelSerializer):
-    id = SerializerMethodField()
-    name = SerializerMethodField()
-    measurement_unit = SerializerMethodField()
-
-    class Meta:
-        model = RecipeIngredients
         fields = ["id", "name", "amount", "measurement_unit"]
 
-    def get_id(self, obj):
-        return obj.ingredient.id
 
-    def get_name(self, obj):
-        return obj.ingredient.name
+class RecipeIngredientsDetailsSerializer(ModelSerializer):
+    id = ReadOnlyField(source='ingredient.id')
+    name = ReadOnlyField(source='ingredient.name')
+    measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
 
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
+    class Meta:
+        model = RecipeIngredientsDetails
+        fields = ["id", "name", "amount", "measurement_unit"]
 
 
 class AuthorSerializer(ModelSerializer):
@@ -35,17 +26,24 @@ class AuthorSerializer(ModelSerializer):
         fields = ["id", "username", "first_name", "last_name", "email"]
 
 
-class RecipeSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsSerializer(many=True)
-    author = AuthorSerializer()
-
-    class Meta:
-        model = Recipe
-        fields = "__all__"
-        depth = 1
-
-
 class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
         fields = ["id", "name", "color", "slug"]
+
+
+class RecipeSerializer(ModelSerializer):
+    ingredients = RecipeIngredientsDetailsSerializer(source="recipeingredientsdetails_set", many=True)
+    tags = TagSerializer(many=True)
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Recipe
+        fields = ["id", "author", "name", "text", "ingredients", "tags"]
+        depth = 1
+
+    # def to_internal_value(self, data):
+    #     data["author"] = self.context.get('request').user
+    #     return data
+    #
+
