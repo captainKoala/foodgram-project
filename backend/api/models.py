@@ -68,6 +68,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name="Изображение",
         help_text="Добавьте изображение",
+        blank=True,
         null=True,
     )
     text = models.TextField(
@@ -116,6 +117,10 @@ class RecipeIngredientsDetails(models.Model):
         verbose_name="Количество",
         help_text="Введите количество"
     )
+
+    class Meta:
+        verbose_name = "Ингридиент рецепта"
+        verbose_name_plural = "Ингридиенты рецепта"
 
     def __str__(self):
         return f"{self.recipe} - {self.ingredient}"

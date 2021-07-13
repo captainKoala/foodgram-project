@@ -7,7 +7,7 @@ from api.models import User
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ["id", "name", "amount", "measurement_unit"]
+        fields = ["id", "name", "measurement_unit"]
 
 
 class RecipeIngredientsDetailsSerializer(ModelSerializer):
@@ -33,17 +33,12 @@ class TagSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsDetailsSerializer(source="recipeingredientsdetails_set", many=True)
-    tags = TagSerializer(many=True)
+    ingredients = RecipeIngredientsDetailsSerializer(
+        source="recipeingredientsdetails_set", many=True)
+    tags = TagSerializer(many=True, read_only=True)
     author = AuthorSerializer()
 
     class Meta:
         model = Recipe
         fields = ["id", "author", "name", "text", "ingredients", "tags"]
         depth = 1
-
-    # def to_internal_value(self, data):
-    #     data["author"] = self.context.get('request').user
-    #     return data
-    #
-
