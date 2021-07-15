@@ -9,29 +9,29 @@ from api.models import User
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ["id", "name", "measurement_unit"]
+        fields = ["recipe_id", "name", "measurement_unit"]
 
 
 class RecipeIngredientsDetailsSerializer(ModelSerializer):
-    id = ReadOnlyField(source='ingredient.id')
+    id = ReadOnlyField(source='ingredient.recipe_id')
     name = ReadOnlyField(source='ingredient.name')
     measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
 
     class Meta:
         model = RecipeIngredientsDetails
-        fields = ["id", "name", "amount", "measurement_unit"]
+        fields = ["recipe_id", "name", "amount", "measurement_unit"]
 
 
 class AuthorSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email"]
+        fields = ["recipe_id", "username", "first_name", "last_name", "email"]
 
 
 class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ["id", "name", "color", "slug"]
+        fields = ["recipe_id", "name", "color", "slug"]
 
 
 class RecipeSerializer(ModelSerializer):
@@ -42,21 +42,8 @@ class RecipeSerializer(ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ["id", "author", "name", "text", "ingredients", "tags"]
+        fields = ["recipe_id", "author", "name", "text", "ingredients", "tags"]
         depth = 1
-
-
-class RecipeFavouriteSerializer(ModelSerializer):
-    # name = ReadOnlyField(source="recipe_set")
-    # cooking_time = ReadOnlyField(source="recipe_set")
-
-    class Meta:
-        model = RecipeFavourite
-        fields = ["id", "user", "recipe"]
-        depth = 1
-
-    def create(self, validated_data):
-        pass
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

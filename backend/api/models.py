@@ -143,5 +143,8 @@ class RecipeFavourite(models.Model):
         verbose_name="Рецепт",
     )
 
+    class Meta:
+        unique_together = [['user', 'recipe']]
+
     def __str__(self):
         return f"{self.user} - {self.recipe}"

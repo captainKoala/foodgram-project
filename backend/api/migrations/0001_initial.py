@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Ingredient',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('recipe_id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(help_text='Введите название ингридиента', max_length=200, verbose_name='Название')),
                 ('measurement_unit', models.CharField(help_text='Введите единицу измерения', max_length=200, verbose_name='Единица измерения')),
             ],
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Recipe',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('recipe_id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(help_text='Введите название рецепта', max_length=200, verbose_name='Название')),
                 ('image', models.ImageField(help_text='Добавьте изображение', null=True, upload_to='', verbose_name='Изображение')),
                 ('text', models.TextField(help_text='Введите текстовое описание', verbose_name='Текстовое описание')),
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('recipe_id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(help_text='Введите тег', max_length=200, unique=True, verbose_name='Название')),
                 ('color', models.CharField(help_text='Выберите цветовой HEX-код (пример: #FF0033)', max_length=200, unique=True, validators=[django.core.validators.RegexValidator(regex='#[0-9a-fA-F]{6}')], verbose_name='Цвет')),
                 ('slug', models.SlugField(help_text='Введите slug', max_length=200, unique=True, verbose_name='Slug')),
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='RecipeIngredientsDetails',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('recipe_id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('amount', models.FloatField(help_text='Введите количество', verbose_name='Количество')),
                 ('ingredient', models.ForeignKey(help_text='Добавьте ингредиент', on_delete=django.db.models.deletion.CASCADE, to='api.ingredient', verbose_name='Ингредиент')),
                 ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.recipe', verbose_name='Рецепт')),
