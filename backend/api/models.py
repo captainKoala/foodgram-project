@@ -91,6 +91,10 @@ class Recipe(models.Model):
         help_text="Введите время приготовления в минутах",
         validators=[MinValueValidator(limit_value=1)]
     )
+    pub_date = models.DateTimeField(
+        verbose_name="Дата публикации",
+        auto_now=True,
+    )
 
     class Meta:
         verbose_name = "Рецепт"
@@ -124,3 +128,20 @@ class RecipeIngredientsDetails(models.Model):
 
     def __str__(self):
         return f"{self.recipe} - {self.ingredient}"
+
+
+class RecipeFavourite(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="recipe_favourites",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name="Рецепт",
+    )
+
+    def __str__(self):
+        return f"{self.user} - {self.recipe}"

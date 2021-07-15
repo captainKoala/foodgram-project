@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import HttpResponse
 
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -7,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import Ingredient, Recipe, RecipeIngredientsDetails, Tag
+from .models import Ingredient, Recipe, RecipeFavourite, RecipeIngredientsDetails, Tag
 from .permissions import IsAuthorOrReadOnly
-from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .serializers import IngredientSerializer, RecipeSerializer, RecipeFavouriteSerializer, TagSerializer
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -77,7 +78,17 @@ class RecipeViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
+class RecipeFavouriteViewSet(ModelViewSet):
+    queryset = RecipeFavourite.objects.all()
+    serializer_class = RecipeFavouriteSerializer
+
+
 class TagViewSet(ReadOnlyModelViewSet):
     pagination_class = None
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+def index(request):
+    last_recipes = Recipe.objects.order_by("pub_date")
+    return HttpResponse("Hello world!")

@@ -1,6 +1,8 @@
+from djoser.serializers import UserCreateSerializer
+
 from rest_framework.serializers import ReadOnlyField, ModelSerializer, SerializerMethodField
 
-from .models import Ingredient, RecipeIngredientsDetails, Recipe, Tag
+from .models import Ingredient, Recipe, RecipeFavourite, RecipeIngredientsDetails, Tag
 from api.models import User
 
 
@@ -42,3 +44,22 @@ class RecipeSerializer(ModelSerializer):
         model = Recipe
         fields = ["id", "author", "name", "text", "ingredients", "tags"]
         depth = 1
+
+
+class RecipeFavouriteSerializer(ModelSerializer):
+    # name = ReadOnlyField(source="recipe_set")
+    # cooking_time = ReadOnlyField(source="recipe_set")
+
+    class Meta:
+        model = RecipeFavourite
+        fields = ["id", "user", "recipe"]
+        depth = 1
+
+    def create(self, validated_data):
+        pass
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email', 'first_name', 'last_name']
