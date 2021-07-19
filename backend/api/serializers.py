@@ -17,7 +17,7 @@ class IngredientSerializer(ModelSerializer):
         return Ingredient.objects.get(id=data)
 
 
-class RecipeIngredientsDetailsSerializer(ModelSerializer):
+class RecipeIngredientsDetailsListSerializer(ModelSerializer):
     id = ReadOnlyField(source='ingredient.id')
     name = ReadOnlyField(source='ingredient.name')
     measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
@@ -33,15 +33,6 @@ class RecipeIngredientsDetailsCreateSerializer(ModelSerializer):
     class Meta:
         model = RecipeIngredientsDetails
         fields = ["id", "amount"]
-
-    # def to_internal_value(self, data):
-    #     print("\n"*5)
-    #     print("to_internal_value:")
-    #     print(self)
-    #     return RecipeIngredientsDetails.objects.create(
-    #         ingredient_id=data["id"],
-    #         amount=data["amount"],
-    #     )
 
 
 class AuthorSerializer(ModelSerializer):
@@ -60,54 +51,50 @@ class TagSerializer(ModelSerializer):
 
 
 class RecipeListSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsDetailsSerializer(
+    ingredients = RecipeIngredientsDetailsListSerializer(
         source="recipeingredientsdetails_set", many=True)
     tags = TagSerializer(many=True, read_only=True)
     author = AuthorSerializer()
-    # image = Base64ImageField(max_length=None, use_url=False)
+    image = Base64ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Recipe
-        fields = ["id", "author", "name", "text", "ingredients", "tags"]
+        fields = ["id", "author", "name", "text", "ingredients", "tags", "image"]
 
 
 class RecipeCreateSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientsDetailsCreateSerializer(many=True)
+    image = Base64ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Recipe
-        exclude = ["image", "pub_date"]
+        exclude = ["pub_date"]
 
     def create(self, validated_data):
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
 
         recipe = Recipe.objects.create(**validated_data)
+
         recipe.tags.set(tags)
 
-        rec_ingredients = []
+        recipe_ingredients = []
         for ingredient in ingredients:
-            rec_ingredient = RecipeIngredientsDetails.objects.create(
+            recipe_ingredients.append(RecipeIngredientsDetails(
                 recipe=recipe,
                 ingredient=ingredient["id"],
                 amount=ingredient["amount"],
-            )
-            rec_ingredients.append(rec_ingredient)
-
-        # recipe.ingredients.set(rec_ingredients)
+            ))
+        RecipeIngredientsDetails.objects.bulk_create(recipe_ingredients)
         return recipe
 
     def to_representation(self, instance):
         data = RecipeListSerializer(
             instance,
-            context={'request': self.context.get('request')}
+            context={"request": self.context.get("request")}
         ).data
         return data
-    # def to_representation(self, instance):
-    #     print("\n"*5)
-    #     print("instance:")
-    #     print(instance)
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

@@ -17,7 +17,7 @@ from .models import Ingredient, Recipe, RecipeShoppingCart, RecipeFavourite, Rec
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, TagSerializer,
-                          RecipeIngredientsDetailsSerializer,
+                          RecipeIngredientsDetailsListSerializer,
                           RecipeIngredientsDetailsCreateSerializer)
 
 
@@ -31,11 +31,11 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 class RecipeIngredientDetailsViewSet(ModelViewSet):
     queryset = RecipeIngredientsDetails.objects.all()
-    # serializer_class = RecipeIngredientsDetailsSerializer
+    # serializer_class = RecipeIngredientsDetailsListSerializer
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
-            return RecipeIngredientsDetailsSerializer
+            return RecipeIngredientsDetailsListSerializer
         return RecipeIngredientsDetailsCreateSerializer
 
 

@@ -131,3 +131,6 @@ dmypy.json
 # .idea
 .idea
 /backend/TASKS.txt
+
+
+media/
