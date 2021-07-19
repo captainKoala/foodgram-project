@@ -35,7 +35,6 @@ class Tag(models.Model):
         verbose_name="Цвет",
         help_text="Выберите цветовой HEX-код (пример: #FF0033)",
         max_length=200,
-        unique=True,
         validators=[RegexValidator(regex=r"#[0-9a-fA-F]{6}")],
     )
     slug = models.SlugField(
@@ -67,9 +66,10 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         verbose_name="Изображение",
-        help_text="Добавьте изображение",
-        blank=True,
+        help_text="Загрузите изображение",
+        upload_to="recipes",
         null=True,
+        blank=True,
     )
     text = models.TextField(
         verbose_name="Текстовое описание",
@@ -105,6 +105,7 @@ class Recipe(models.Model):
 
 
 class RecipeIngredientsDetails(models.Model):
+    """ Описывает количество для каждого ингридиента в рецепте."""
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="Рецепт",
@@ -117,9 +118,10 @@ class RecipeIngredientsDetails(models.Model):
         help_text="Добавьте ингредиент",
         on_delete=models.CASCADE,
     )
-    amount = models.FloatField(
+    amount = models.IntegerField(
         verbose_name="Количество",
-        help_text="Введите количество"
+        help_text="Введите количество",
+        validators=[MinValueValidator(limit_value=1)],
     )
 
     class Meta:
@@ -131,6 +133,7 @@ class RecipeIngredientsDetails(models.Model):
 
 
 class RecipeFavourite(models.Model):
+    """ Добавление рецепта в избранное. """
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -141,6 +144,7 @@ class RecipeFavourite(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         verbose_name="Рецепт",
+        related_name="favourites",
     )
 
     class Meta:
@@ -148,3 +152,40 @@ class RecipeFavourite(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.recipe}"
+
+
+class RecipeShoppingCart(models.Model):
+    """ Добавление рецепта в список покупок. """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name="Рецепт",
+        help_text="Выберите рецепт",
+        on_delete=models.CASCADE,
+        related_name="to_shopping",
+    )
+
+    class Meta:
+        unique_together = [['user', 'recipe']]
+
+    def __str__(self):
+        return f"{self.user} - {self.recipe}"
+
+
+class UserFollow(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
+        related_name="follows",
+    )
+    follow_to = models.ForeignKey(
+        User,
+        verbose_name="Подписан на пользователя",
+        on_delete=models.CASCADE,
+        related_name="followers",
+    )

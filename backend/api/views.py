@@ -13,9 +13,12 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import Ingredient, Recipe, RecipeFavourite, RecipeIngredientsDetails, Tag
+from .models import Ingredient, Recipe, RecipeShoppingCart, RecipeFavourite, RecipeIngredientsDetails, Tag
 from .permissions import IsAuthorOrReadOnly
-from .serializers import IngredientSerializer, RecipeSerializer, RecipeFavouriteSerializer, TagSerializer
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeListSerializer, TagSerializer,
+                          RecipeIngredientsDetailsSerializer,
+                          RecipeIngredientsDetailsCreateSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -26,61 +29,33 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     search_fields = ['name']
 
 
+class RecipeIngredientDetailsViewSet(ModelViewSet):
+    queryset = RecipeIngredientsDetails.objects.all()
+    # serializer_class = RecipeIngredientsDetailsSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return RecipeIngredientsDetailsSerializer
+        return RecipeIngredientsDetailsCreateSerializer
+
+
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all().order_by("id")
-    serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return RecipeListSerializer
+        return RecipeCreateSerializer
+
     def create(self, request, *args, **kwargs):
         data = request.data
-
-        tag_ids = data.pop("tags")
-        tags = []
-        for tag_id in tag_ids:
-            try:
-                tag = Tag.objects.get(id=tag_id)
-            except Tag.DoesNotExist:
-                raise ValidationError({
-                    "detail": "Тег с указанным recipe_id не найден."})
-            tags.append(tag)
-
-        rec_ingredients_data = data.pop("ingredients")
-
-        data["author_id"] = request.user.id
-
-        recipe = Recipe(**data)
-
-        ingredients = []
-        rec_ingredients = []
-        for rec_ingredient_id in rec_ingredients_data:
-            try:
-                ingredient = Ingredient.objects.get(id=rec_ingredient_id["recipe_id"])
-            except KeyError:
-                raise ValidationError({
-                    "detail": "Необходимо указать recipe_id ингридиента."})
-            except Ingredient.DoesNotExist:
-                raise ValidationError({
-                    "detail": "Ингредиент с указанным recipe_id не найден."})
-            amount = rec_ingredient_id.get("amount")
-            if amount is None:
-                raise ValidationError({
-                    "detail": "Значение amount не передано."})
-            ingredients.append(ingredient)
-            rec_ingredients.append(RecipeIngredientsDetails(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=amount)
-            )
-        recipe.save()
-        RecipeIngredientsDetails.objects.bulk_create(rec_ingredients)
-
-        recipe.tags.set(tags)
-        recipe.ingredients.set(ingredients)
-
-        serializer = self.get_serializer(recipe)
-
-        return Response(serializer.data)
+        data["author"] = request.user.id
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -90,8 +65,8 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 def index(request):
-    last_recipes = Recipe.objects.order_by("pub_date")
-    return HttpResponse("Hello world!")
+    last_recipes = Recipe.objects.order_by("pub_date")[:6]
+    return HttpResponse()
 
 
 @api_view(["POST", "DELETE"])
@@ -108,7 +83,7 @@ def recipe_favourites(request, recipe_id):
         except IntegrityError:
             return Response({"errors": "Рецепт уже добавлен в избранное"},
                             status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({"recipe_id": favourite.id,
+        return JsonResponse({"id": favourite.id,
                              "name": recipe.name,
                              # "image": recipe.image.url,
                              "cooking_time": recipe.cooking_time,
@@ -118,4 +93,51 @@ def recipe_favourites(request, recipe_id):
     favourite = get_object_or_404(RecipeFavourite, recipe=recipe, user=user)
     favourite.delete()
     return Response({"detail": "Рецепт удален из избранного"},
+                    status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def get_shopping_cart(request):
+    user = request.user
+    if user.is_anonymous:
+        return Response({"detail": "Учетные данные не были предоставлены."},
+                        status=status.HTTP_403_FORBIDDEN)
+    shopping_cart = RecipeShoppingCart.objects.filter(user=user)
+    purchases = {}
+    for cart in shopping_cart:
+        recipe_ingredients = RecipeIngredientsDetails.objects.filter(recipe=cart.recipe)
+        for recipe_ingredient in recipe_ingredients:
+            name = recipe_ingredient.ingredient.name
+            amount = recipe_ingredient.amount
+            if name in purchases:
+                purchases[name] += amount
+            else:
+                purchases[name] = amount
+    return Response(purchases)
+
+
+@api_view(["POST", "DELETE"])
+def manage_shopping_cart(request, recipe_id):
+    user = request.user
+    if user.is_anonymous:
+        return Response({"detail": "Учетные данные не были предоставлены."},
+                        status=status.HTTP_403_FORBIDDEN)
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if request.method == "POST":
+        try:
+            cart = RecipeShoppingCart.objects.create(user=user, recipe=recipe)
+        except IntegrityError:
+            return Response({"errors": "Рецепт уже добавлен в список покупок"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"id": cart.id,
+                             "name": recipe.name,
+                             # "image": recipe.image.url,
+                             "cooking_time": recipe.cooking_time,
+                             }, status=status.HTTP_201_CREATED
+                            )
+    # метод DELETE
+    cart = get_object_or_404(RecipeShoppingCart, recipe=recipe, user=user)
+    cart.delete()
+    return Response({"detail": "Рецепт удален из списка покупок"},
                     status=status.HTTP_204_NO_CONTENT)
