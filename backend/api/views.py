@@ -49,14 +49,6 @@ class RecipeViewSet(ModelViewSet):
             return RecipeListSerializer
         return RecipeCreateSerializer
 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        data["author"] = request.user.id
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class TagViewSet(ReadOnlyModelViewSet):
     pagination_class = None

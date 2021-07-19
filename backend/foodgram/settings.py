@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'api',
+    # удаление файлов и изображений при удалении записи в БД
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

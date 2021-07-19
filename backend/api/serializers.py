@@ -66,6 +66,8 @@ class RecipeCreateSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientsDetailsCreateSerializer(many=True)
     image = Base64ImageField(max_length=None, use_url=True)
+    from rest_framework.serializers import PrimaryKeyRelatedField
+    author = PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -75,7 +77,8 @@ class RecipeCreateSerializer(ModelSerializer):
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
 
-        recipe = Recipe.objects.create(**validated_data)
+        recipe = Recipe.objects.create(**validated_data,
+                                       author=self.context["request"].user)
 
         recipe.tags.set(tags)
 
@@ -88,6 +91,35 @@ class RecipeCreateSerializer(ModelSerializer):
             ))
         RecipeIngredientsDetails.objects.bulk_create(recipe_ingredients)
         return recipe
+
+    def update(self, instance, validated_data):
+        tags = validated_data.pop("tags")
+        ingredients = validated_data.pop("ingredients")
+
+        # validated_data["author"] = self.context["request"].user
+        # for key, value in validated_data.items():
+        #     instance[key] = value
+        instance.name = validated_data.get("name")
+        instance.text = validated_data.get("text")
+        instance.image = validated_data.get('image')
+        instance.cooking_time = validated_data.get('cooking_time')
+        instance.save()
+
+        RecipeIngredientsDetails.objects.filter(recipe=instance).delete()
+
+        instance.tags.set(tags)
+
+        recipe_ingredients = []
+        for ingredient in ingredients:
+            recipe_ingredients.append(RecipeIngredientsDetails(
+                recipe=instance,
+                ingredient=ingredient["id"],
+                amount=ingredient["amount"],
+            ))
+        RecipeIngredientsDetails.objects.bulk_create(recipe_ingredients)
+
+        return instance
+
 
     def to_representation(self, instance):
         data = RecipeListSerializer(
