@@ -131,7 +131,7 @@ REST_FRAMEWORK = {
     ),
     'SEARCH_PARAM': 'name',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 6,
 }
 
 AUTH_USER_MODEL = 'users.User'

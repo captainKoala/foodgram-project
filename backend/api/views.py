@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
@@ -40,7 +40,6 @@ class RecipeIngredientDetailsViewSet(ModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.all().order_by("id")
     pagination_class = PageNumberPagination
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
@@ -49,6 +48,21 @@ class RecipeViewSet(ModelViewSet):
             return RecipeListSerializer
         return RecipeCreateSerializer
 
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        user = self.request.user
+
+        params = self.request.query_params
+        tags = params.getlist("tags")
+        is_favorited = params.get("is_favorited")
+
+        if tags:
+            queryset = queryset.filter(tags__slug__in=tags).distinct()
+        if is_favorited:
+            queryset = queryset.filter(favourites__user=user)
+
+        return queryset
+
 
 class TagViewSet(ReadOnlyModelViewSet):
     pagination_class = None
@@ -56,12 +70,7 @@ class TagViewSet(ReadOnlyModelViewSet):
     serializer_class = TagSerializer
 
 
-def index(request):
-    last_recipes = Recipe.objects.order_by("pub_date")[:6]
-    return HttpResponse()
-
-
-@api_view(["POST", "DELETE"])
+@api_view(["GET", "DELETE"])
 def recipe_favourites(request, recipe_id):
     user = request.user
     if user.is_anonymous:
@@ -69,7 +78,7 @@ def recipe_favourites(request, recipe_id):
                         status=status.HTTP_403_FORBIDDEN)
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
-    if request.method == "POST":
+    if request.method == "GET":
         try:
             favourite = RecipeFavourite.objects.create(user=user, recipe=recipe)
         except IntegrityError:
@@ -77,7 +86,7 @@ def recipe_favourites(request, recipe_id):
                             status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse({"id": favourite.id,
                              "name": recipe.name,
-                             # "image": recipe.image.url,
+                             "image": recipe.image.url,
                              "cooking_time": recipe.cooking_time,
                              }, status=status.HTTP_201_CREATED
                             )
@@ -89,6 +98,17 @@ def recipe_favourites(request, recipe_id):
 
 
 @api_view(["GET"])
+def list_recipe_favourites(request):
+    user = request.user
+    if user.is_anonymous:
+        return Response({"detail": "Учетные данные не были предоставлены."},
+                        status=status.HTTP_403_FORBIDDEN)
+    favourite_recipes = RecipeFavourite.objects.filter(user=user)
+    from django.core import serializers
+    return JsonResponse(serializers.serialize('json', favourite_recipes), safe=False)
+
+
+@api_view(["GET"])
 def get_shopping_cart(request):
     user = request.user
     if user.is_anonymous:
@@ -97,7 +117,8 @@ def get_shopping_cart(request):
     shopping_cart = RecipeShoppingCart.objects.filter(user=user)
     purchases = {}
     for cart in shopping_cart:
-        recipe_ingredients = RecipeIngredientsDetails.objects.filter(recipe=cart.recipe)
+        recipe_ingredients = RecipeIngredientsDetails.objects.filter(
+            recipe=cart.recipe)
         for recipe_ingredient in recipe_ingredients:
             name = recipe_ingredient.ingredient.name
             amount = recipe_ingredient.amount
@@ -124,7 +145,7 @@ def manage_shopping_cart(request, recipe_id):
                             status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse({"id": cart.id,
                              "name": recipe.name,
-                             # "image": recipe.image.url,
+                             "image": recipe.image,
                              "cooking_time": recipe.cooking_time,
                              }, status=status.HTTP_201_CREATED
                             )
