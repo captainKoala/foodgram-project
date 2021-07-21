@@ -182,30 +182,5 @@ class SubscriptionsViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        params = self.request.query_params
-        recipes_limit = int(params.get("recipes_limit"))
-
         queryset = User.objects.filter(followers__user=user)
-        if recipes_limit:
-            queryset = queryset[:recipes_limit]
         return queryset
-
-
-# @api_view(["GET"])
-# def subscriptions(request):
-#     user = request.user
-#     params = request.query_params
-#     recipes_limit = params.get("recipes_limit")
-#     # follow_to = UserFollow.objects.filter(user=user)
-#     follow_to = User.objects.filter(followers__user=user)
-#     # print("\n"*5)
-#     # print("follow_to:")
-#     # print(follow_to)
-#
-#     # recipes = Recipe.objects.filter(author__in=follow_to) #[:recipes_limit]
-#     # print(recipes)
-#     serializer = CustomUserSerializer(follow_to, many=True,
-#                                       context={"request": request})
-#     # print("serializer.data:")
-#     # print(serializer.data)
-#     return Response(serializer.data)

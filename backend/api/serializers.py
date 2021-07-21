@@ -156,7 +156,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 class CustomUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField()
-    recipes = RecipeReadShortSerializer(many=True)
+    recipes = SerializerMethodField()
     recipes_count = SerializerMethodField()
 
     class Meta:
@@ -165,10 +165,26 @@ class CustomUserSerializer(UserSerializer):
                   "is_subscribed", "recipes", "recipes_count"]
 
     def get_is_subscribed(self, obj):
-        user = self.context["request"].user
+        user = self.context.get("request").user
         if user.is_anonymous:
             return False
         return UserFollow.objects.filter(user=user, follow_to=obj).exists()
+
+    def get_recipes(self, obj):
+        recipes = Recipe.objects.filter(author=obj).order_by("-pub_date")
+
+        params = self.context.get("request").query_params
+        recipes_limit = params.get("recipes_limit")
+        if recipes_limit is not None:
+            recipes_limit = int(recipes_limit)
+            recipes = recipes[:recipes_limit]
+
+        serializer = RecipeReadShortSerializer(
+            recipes,
+            many=True,
+            context={"request": self.context.get("request")}
+        )
+        return serializer.data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
