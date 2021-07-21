@@ -1,11 +1,12 @@
-from djoser.serializers import UserCreateSerializer
-
 from drf_extra_fields.fields import Base64ImageField
+
+from djoser.serializers import UserCreateSerializer, UserSerializer
 
 from rest_framework.serializers import ReadOnlyField, ModelSerializer, PrimaryKeyRelatedField, SerializerMethodField
 
-from .models import Ingredient, Recipe, RecipeFavourite, RecipeIngredientsDetails, RecipeShoppingCart, Tag
-from api.models import User
+from .models import (Ingredient, Recipe, RecipeFavourite,
+                     RecipeIngredientsDetails, RecipeShoppingCart, Tag, User,
+                     UserFollow)
 
 
 class IngredientSerializer(ModelSerializer):
@@ -17,7 +18,7 @@ class IngredientSerializer(ModelSerializer):
         return Ingredient.objects.get(id=data)
 
 
-class RecipeIngredientsDetailsListSerializer(ModelSerializer):
+class RecipeIngredientsDetailsReadSerializer(ModelSerializer):
     id = ReadOnlyField(source='ingredient.id')
     name = ReadOnlyField(source='ingredient.name')
     measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
@@ -50,8 +51,8 @@ class TagSerializer(ModelSerializer):
         return Tag.objects.get(id=data)
 
 
-class RecipeListSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsDetailsListSerializer(
+class RecipeReadSerializer(ModelSerializer):
+    ingredients = RecipeIngredientsDetailsReadSerializer(
         source="recipeingredientsdetails_set", many=True)
     tags = TagSerializer(many=True, read_only=True)
     author = AuthorSerializer()
@@ -134,14 +135,55 @@ class RecipeCreateSerializer(ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        data = RecipeListSerializer(
+        data = RecipeReadSerializer(
             instance,
             context={"request": self.context.get("request")}
         ).data
         return data
 
 
+class RecipeReadShortSerializer(ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ["id", "name", "image", "cooking_time"]
+
+
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'email', 'first_name', 'last_name']
+        fields = ["username", "password", "email", "first_name", "last_name"]
+
+
+class CustomUserSerializer(UserSerializer):
+    is_subscribed = SerializerMethodField()
+    recipes = RecipeReadShortSerializer(many=True)
+    recipes_count = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name",
+                  "is_subscribed", "recipes", "recipes_count"]
+
+    def get_is_subscribed(self, obj):
+        user = self.context["request"].user
+        if user.is_anonymous:
+            return False
+        return UserFollow.objects.filter(user=user, follow_to=obj).exists()
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
+
+
+class CustomUserShortSerializer(UserSerializer):
+    is_subscribed = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name",
+                  "is_subscribed",]
+
+    def get_is_subscribed(self, obj):
+        user = self.context["request"].user
+        if user.is_anonymous:
+            return False
+        return UserFollow.objects.filter(user=user, follow_to=obj).exists()

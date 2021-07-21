@@ -58,6 +58,7 @@ class Recipe(models.Model):
         verbose_name="Автор",
         help_text="Введите имя автора",
         on_delete=models.CASCADE,
+        related_name="recipes",
     )
     name = models.CharField(
         verbose_name="Название",
@@ -189,3 +190,6 @@ class UserFollow(models.Model):
         on_delete=models.CASCADE,
         related_name="followers",
     )
+
+    class Meta:
+        unique_together = [["user", "follow_to"]]

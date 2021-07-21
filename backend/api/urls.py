@@ -2,14 +2,14 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from .views import (recipe_favourites, list_recipe_favourites, get_shopping_cart,
+from .views import (recipe_favourites, get_shopping_cart,
                     manage_shopping_cart, IngredientViewSet, RecipeViewSet,
-                    RecipeIngredientDetailsViewSet, TagViewSet)
+                    subscribe, SubscriptionsViewSet, TagViewSet,)
 
-router = DefaultRouter()
-router.register('ingredients', IngredientViewSet, basename='ingredients')
-router.register('recipes', RecipeViewSet, basename='recipes')
-router.register('tags', TagViewSet, basename='tags')
+api_router = DefaultRouter()
+api_router.register('ingredients', IngredientViewSet, basename='ingredients')
+api_router.register('recipes', RecipeViewSet, basename='recipes')
+api_router.register('tags', TagViewSet, basename='tags')
 
 urlpatterns = [
     path('api/recipes/<int:recipe_id>/favorite/',
@@ -21,5 +21,11 @@ urlpatterns = [
     path('api/recipes/<int:recipe_id>/shopping_cart/',
          manage_shopping_cart,
          name='manage_shopping_cart'),
-    path('api/', include(router.urls)),
+    path('api/', include(api_router.urls)),
+    path('api/users/subscriptions/',
+         SubscriptionsViewSet.as_view({'get': 'list'}),
+         name='subscriptions'),
+    path('api/users/<int:author_id>/subscribe/',
+         subscribe,
+         name='subscribe'),
 ]
