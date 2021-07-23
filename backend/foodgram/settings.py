@@ -132,6 +132,10 @@ REST_FRAMEWORK = {
     'SEARCH_PARAM': 'name',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'TEST_REQUEST_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
 
 AUTH_USER_MODEL = 'users.User'
@@ -140,7 +144,7 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
         'user_create': 'api.serializers.CustomUserCreateSerializer',
-        'user': 'api.serializers.CustomUserSerializer',
+        'user': 'api.serializers.CustomUserShortSerializer',
         'current_user': 'api.serializers.CustomUserShortSerializer',
     },
     'PERMISSIONS': {
