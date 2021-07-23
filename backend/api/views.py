@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -116,13 +116,22 @@ def get_shopping_cart(request):
         recipe_ingredients = RecipeIngredientsDetails.objects.filter(
             recipe=cart.recipe)
         for recipe_ingredient in recipe_ingredients:
-            name = recipe_ingredient.ingredient.name
+            name = (f"{recipe_ingredient.ingredient.name} "
+                    f"({recipe_ingredient.ingredient.measurement_unit})")
             amount = recipe_ingredient.amount
             if name in purchases:
                 purchases[name] += amount
             else:
                 purchases[name] = amount
-    return Response(purchases)
+    text = "СПИСОК ПОКУПОК\n"
+    for key, value in purchases.items():
+        text += f"{key} - {value}\n"
+
+    response = HttpResponse(text,
+                            content_type="application/text charset=utf-8")
+    response['Content-Disposition'] = ("attachment; "
+                                       "filename=\"shopping-cart.txt\"")
+    return response
 
 
 @api_view(["GET", "DELETE"])

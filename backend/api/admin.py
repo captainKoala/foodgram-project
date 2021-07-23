@@ -8,6 +8,7 @@ from .models import (Ingredient, Recipe, RecipeFavourite, RecipeShoppingCart,
 class IngredientAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_display = ["name"]
+    list_filter = ["name"]
 
 
 class RecipeIngredientsDetailsInline(admin.TabularInline):
@@ -17,7 +18,7 @@ class RecipeIngredientsDetailsInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     search_fields = ["name", "text"]
-    list_filter = ["author", "tags"]
+    list_filter = ["author", "name", "tags"]
     list_display = ["name", "author"]
     inlines = [RecipeIngredientsDetailsInline]
 
