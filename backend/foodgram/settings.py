@@ -9,13 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fjb(qo^*rl%!4o1%-jbkhkvux5cv6p_n7cn_g50m_5eh4l5!=9'
+SECRET_KEY = os.environ.get('SECRET_KEY',
+                            default='django-insecure-fjb(qo^*rl%!4o1%-jbkhkvu')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = '*'
+# ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
+#                                default='localhost 127.0.0.1').split(' ')
 
 # Application definition
 
@@ -75,6 +77,19 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.environ.get('DB_ENGINE',
+#                                  default='django.db.backends.postgresql'),
+#         'NAME': os.environ.get('DB_NAME',
+#                                default=os.path.join(BASE_DIR, 'postgres')),
+#         'USER': os.environ.get('POSTGRES_USER'),
+#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#     }
+# }
 
 
 # Password validation
