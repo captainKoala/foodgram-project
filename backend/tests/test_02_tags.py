@@ -18,20 +18,20 @@ class TagsTestCase(APITestCase):
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK,
-            f"Проверьте, что запрос на адрес '{data.TAGS_LIST_URL}' возвращает "
-            f"статус 200."
+            f"Проверьте, что запрос на адрес '{data.TAGS_LIST_URL}' возвращает"
+            f" статус 200."
         )
         self.assertEqual(
             len(response.data),
             2,
-            f"Проверьте, что в ответе по запросу на адрес '{data.TAGS_LIST_URL}' "
-            f"передаются все теги."
+            f"Проверьте, что в ответе по запросу на адрес "
+            f"'{data.TAGS_LIST_URL}' передаются все теги."
         )
         self.assertIsInstance(
             response.data,
             List,
-            f"Проверьте, что в ответе по запросу на адрес '{data.TAGS_LIST_URL}' "
-            f"передается список."
+            f"Проверьте, что в ответе по запросу на адрес "
+            f"'{data.TAGS_LIST_URL}' передается список."
         )
 
         expected_data = data.TAG_DATA_1.copy()
@@ -39,7 +39,8 @@ class TagsTestCase(APITestCase):
         self.assertEqual(
             response.data[0],
             expected_data,
-            f"Проверьте, что в ответе по запросу на адрес '{data.TAGS_LIST_URL}' "
+            f"Проверьте, что в ответе по запросу на адрес "
+            f"'{data.TAGS_LIST_URL}' "
             f"каждый тег содержит необходимые поля."
         )
 
@@ -50,8 +51,8 @@ class TagsTestCase(APITestCase):
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK,
-            f"Проверьте, что запрос на адрес '{data.TAGS_LIST_URL}{{tag_id}}/' "
-            f"возвращает статус 200."
+            f"Проверьте, что запрос на адрес '{data.TAGS_LIST_URL}{{tag_id}}/'"
+            f" возвращает статус 200."
         )
         expected_data = data.TAG_DATA_1.copy()
         expected_data["id"] = 1
@@ -62,4 +63,3 @@ class TagsTestCase(APITestCase):
             f"'{data.TAGS_LIST_URL}{{tag_id}}/' "
             f"каждый тег содержит необходимые поля."
         )
-

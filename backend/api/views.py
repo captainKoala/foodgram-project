@@ -1,25 +1,25 @@
 from django.db import IntegrityError
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import (Ingredient, Recipe, RecipeShoppingCart, RecipeFavourite,
-                     RecipeIngredientsDetails, Tag, UserFollow)
+from users.models import User
+
+from .models import (Ingredient, Recipe, RecipeFavourite,
+                     RecipeIngredientsDetails, RecipeShoppingCart, Tag,
+                     UserFollow)
 from .permissions import IsAuthorOrIsStaffOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer,
-                          RecipeReadSerializer, TagSerializer,
+                          RecipeIngredientsDetailsCreateSerializer,
                           RecipeIngredientsDetailsReadSerializer,
-                          RecipeIngredientsDetailsCreateSerializer)
-
-from users.models import User
+                          RecipeReadSerializer, TagSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -87,7 +87,8 @@ def recipe_favourites(request, recipe_id):
 
     if request.method == "GET":
         try:
-            favourite = RecipeFavourite.objects.create(user=user, recipe=recipe)
+            favourite = RecipeFavourite.objects.create(user=user,
+                                                       recipe=recipe)
         except IntegrityError:
             return Response({"errors": "Рецепт уже добавлен в избранное"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -174,8 +175,10 @@ def subscribe(request, author_id):
         try:
             UserFollow.objects.create(user=user, follow_to=author)
         except IntegrityError:
-            return Response({"errors": "Вы уже подписаны на этого пользователя"},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"errors": "Вы уже подписаны на этого пользователя"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer = CustomUserSerializer(user, context={"request": request})
         return Response(serializer.data)
 
@@ -192,5 +195,4 @@ class SubscriptionsViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = User.objects.filter(followers__user=user)
-        return queryset
+        return User.objects.filter(followers__user=user)

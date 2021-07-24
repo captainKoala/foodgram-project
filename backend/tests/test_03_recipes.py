@@ -1,9 +1,8 @@
 from rest_framework import status
-from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 
-
-from api.models import Ingredient, Recipe, User, Tag
+from api.models import Ingredient, Tag, User
 
 from . import data
 
@@ -40,4 +39,3 @@ class RecipesTestCase(APITestCase):
             "Проверьте, что при создании рецепта авторизованным пользователем "
             "возвращается статус 201."
         )
-

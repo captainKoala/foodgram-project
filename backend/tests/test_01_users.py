@@ -1,6 +1,6 @@
 from rest_framework import status
-from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 
 from users.models import User
 
@@ -108,8 +108,8 @@ class UserTestCase(APITestCase):
 
         self.assertEqual(response_user_data, expected_user_data,
                          f"Проверьте, что в ответе на GET-запрос "
-                         f"'{data.USERS_URL}{{id}}' возвращаются верные данные "
-                         f"о пользователе.")
+                         f"'{data.USERS_URL}{{id}}' возвращаются верные данные"
+                         f" о пользователе.")
 
     def test_get_user_by_id_without_token(self):
         user_id = 2
@@ -156,10 +156,6 @@ class UserTestCase(APITestCase):
                             status.HTTP_404_NOT_FOUND,
                             f"Проверьте, что страница "
                             f"'{data.USERS_SET_PASSWORD_URL}' доступна.")
-        # self.assertEqual(response.status_code,
-        #                  status.HTTP_201_CREATED,
-        #                  "Проверьте, что при изменении пароля возвращается "
-        #                  "статус 201.")
 
     def test_set_password_without_token(self):
         new_password = "new_awesome_password"
@@ -170,8 +166,8 @@ class UserTestCase(APITestCase):
                   "current_password": data.USER_DATA_1["password"]}
         )
         self.assertEqual(response.status_code,
-                            status.HTTP_401_UNAUTHORIZED,
-                            f"Проверьте, что страница запрос на"
-                            f"'{data.USERS_SET_PASSWORD_URL}' возвращает статус"
-                            f" 401.")
+                         status.HTTP_401_UNAUTHORIZED,
+                         f"Проверьте, что страница запрос на"
+                         f"'{data.USERS_SET_PASSWORD_URL}' возвращает "
+                         f"статус 401.")
         self.authenticate()

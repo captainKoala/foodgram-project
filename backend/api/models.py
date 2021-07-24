@@ -195,3 +195,6 @@ class UserFollow(models.Model):
 
     class Meta:
         unique_together = [["user", "follow_to"]]
+
+    def __str__(self):
+        return f"{self.user} - {self.follow_to}"

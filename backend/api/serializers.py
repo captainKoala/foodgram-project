@@ -1,8 +1,8 @@
-from drf_extra_fields.fields import Base64ImageField
-
 from djoser.serializers import UserCreateSerializer, UserSerializer
-
-from rest_framework.serializers import ReadOnlyField, ModelSerializer, PrimaryKeyRelatedField, SerializerMethodField
+from drf_extra_fields.fields import Base64ImageField
+from rest_framework.serializers import (ModelSerializer,
+                                        PrimaryKeyRelatedField, ReadOnlyField,
+                                        SerializerMethodField)
 
 from .models import (Ingredient, Recipe, RecipeFavourite,
                      RecipeIngredientsDetails, RecipeShoppingCart, Tag, User,
@@ -135,11 +135,10 @@ class RecipeCreateSerializer(ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        data = RecipeReadSerializer(
+        return RecipeReadSerializer(
             instance,
             context={"request": self.context.get("request")}
         ).data
-        return data
 
 
 class RecipeReadShortSerializer(ModelSerializer):
@@ -196,7 +195,7 @@ class CustomUserShortSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name",
-                  "is_subscribed",]
+                  "is_subscribed"]
 
     def get_is_subscribed(self, obj):
         user = self.context["request"].user
