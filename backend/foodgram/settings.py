@@ -13,11 +13,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY',
                             default='django-insecure-fjb(qo^*rl%!4o1%-jbkhkvu')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = '*'
-# ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
-#                                default='localhost 127.0.0.1').split(' ')
+# ALLOWED_HOSTS = '*'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
+                               default='localhost 127.0.0.1').split(' ')
 
 # Application definition
 
@@ -73,23 +73,16 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get('DB_ENGINE',
+                                 default='django.db.backends.postgresql'),
+        'NAME': os.environ.get('DB_NAME',
+                               default=os.path.join(BASE_DIR, 'postgres')),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('DB_ENGINE',
-#                                  default='django.db.backends.postgresql'),
-#         'NAME': os.environ.get('DB_NAME',
-#                                default=os.path.join(BASE_DIR, 'postgres')),
-#         'USER': os.environ.get('POSTGRES_USER'),
-#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-#         'HOST': os.environ.get('DB_HOST'),
-#         'PORT': os.environ.get('DB_PORT'),
-#     }
-# }
 
 
 # Password validation
