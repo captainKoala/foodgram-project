@@ -131,7 +131,7 @@ dmypy.json
 # .idea
 .idea
 /backend/TASKS.txt
-
+/backend/data.json
 
 media/
 static/
