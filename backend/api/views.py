@@ -135,6 +135,7 @@ def get_shopping_cart(request):
     return response
 
 
+
 @api_view(["GET", "DELETE"])
 def manage_shopping_cart(request, recipe_id):
     user = request.user

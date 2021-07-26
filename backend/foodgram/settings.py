@@ -14,7 +14,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY',
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# ALLOWED_HOSTS = '*'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
                                default='localhost 127.0.0.1').split(' ')
 
@@ -34,6 +33,7 @@ INSTALLED_APPS = [
     'api',
     # удаление файлов и изображений при удалении записи в БД
     'django_cleanup.apps.CleanupConfig',
+    'colorfield',
 ]
 
 MIDDLEWARE = [

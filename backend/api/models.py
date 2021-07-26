@@ -1,3 +1,5 @@
+from colorfield.fields import ColorField
+
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
@@ -31,16 +33,16 @@ class Tag(models.Model):
         max_length=200,
         unique=True,
     )
-    color = models.CharField(
+    color = ColorField(
         verbose_name="Цвет",
         help_text="Выберите цветовой HEX-код (пример: #FF0033)",
+        default = "#888888",
         max_length=200,
         validators=[RegexValidator(regex=r"#[0-9a-fA-F]{6}")],
     )
     slug = models.SlugField(
         verbose_name="Slug",
         help_text="Введите slug",
-        max_length=200,
         unique=True,
     )
 
@@ -78,7 +80,7 @@ class Recipe(models.Model):
         Ingredient,
         verbose_name="Ингридиенты",
         help_text="Выберите ингридиенты",
-        through='RecipeIngredientsDetails',
+        through="RecipeIngredientsDetails",
     )
     tags = models.ManyToManyField(
         Tag,
@@ -88,7 +90,10 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления (мин)",
         help_text="Введите время приготовления в минутах",
-        validators=[MinValueValidator(limit_value=1)]
+        validators=[MinValueValidator(
+            limit_value=1,
+            message="Значение должно быть не менее 1.")
+        ]
     )
     pub_date = models.DateTimeField(
         verbose_name="Дата публикации",
@@ -120,7 +125,10 @@ class RecipeIngredientsDetails(models.Model):
     amount = models.IntegerField(
         verbose_name="Количество",
         help_text="Введите количество",
-        validators=[MinValueValidator(limit_value=1)],
+        validators=[MinValueValidator(
+            limit_value=1,
+            message="Значение должно быть не менее 1.")
+        ],
     )
 
     class Meta:

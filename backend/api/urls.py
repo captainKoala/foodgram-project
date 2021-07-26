@@ -1,4 +1,5 @@
 from django.urls import include, path
+from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 
 from .views import (IngredientViewSet, RecipeViewSet, SubscriptionsViewSet,
@@ -10,7 +11,10 @@ api_router.register('ingredients', IngredientViewSet, basename='ingredients')
 api_router.register('recipes', RecipeViewSet, basename='recipes')
 api_router.register('tags', TagViewSet, basename='tags')
 
+from .views import index
+
 urlpatterns = [
+    path('temp/', index),
     path('api/recipes/<int:recipe_id>/favorite/',
          recipe_favourites,
          name='manage_recipe_favourites'),
