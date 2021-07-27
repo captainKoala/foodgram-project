@@ -19,9 +19,9 @@ class IngredientSerializer(ModelSerializer):
 
 
 class RecipeIngredientsDetailsReadSerializer(ModelSerializer):
-    id = ReadOnlyField(source='ingredient.id')
-    name = ReadOnlyField(source='ingredient.name')
-    measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
+    id = ReadOnlyField(source="ingredient.id")
+    name = ReadOnlyField(source="ingredient.name")
+    measurement_unit = ReadOnlyField(source="ingredient.measurement_unit")
 
     class Meta:
         model = RecipeIngredientsDetails
@@ -115,8 +115,8 @@ class RecipeCreateSerializer(ModelSerializer):
 
         instance.name = validated_data.get("name")
         instance.text = validated_data.get("text")
-        instance.image = validated_data.get('image')
-        instance.cooking_time = validated_data.get('cooking_time')
+        instance.image = validated_data.get("image")
+        instance.cooking_time = validated_data.get("cooking_time")
         instance.save()
 
         RecipeIngredientsDetails.objects.filter(recipe=instance).delete()

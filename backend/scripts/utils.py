@@ -1,6 +1,6 @@
 import csv
 
-from .models import Ingredient
+from api.models import Ingredient
 
 
 def import_ingredients(csv_file):

@@ -5,18 +5,18 @@ TAGS_LIST_URL = "/api/tags/"
 RECIPES_URL = "/api/recipes/"
 
 USER_DATA_1 = {
-            "username": "test_user_1",
-            "first_name": "Test",
-            "last_name": "User",
-            "email": "test_user@ex.com",
-            "password": "passwordPhrase_1234",
+    "username": "test_user_1",
+    "first_name": "Test",
+    "last_name": "User",
+    "email": "test_user@ex.com",
+    "password": "passwordPhrase_1234",
 }
 USER_DATA_2 = {
-            "username": "test_user_2",
-            "first_name": "Second",
-            "last_name": "User",
-            "email": "test_user_2@ex.com",
-            "password": "very_strong_Password_1234",
+    "username": "test_user_2",
+    "first_name": "Second",
+    "last_name": "User",
+    "email": "test_user_2@ex.com",
+    "password": "very_strong_Password_1234",
 }
 
 TAG_DATA_1 = {

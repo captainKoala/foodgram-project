@@ -27,14 +27,14 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = [SearchFilter]
-    search_fields = ['name']
+    search_fields = ["name"]
 
 
 class RecipeIngredientDetailsViewSet(ModelViewSet):
     queryset = RecipeIngredientsDetails.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ["list", "retrieve"]:
             return RecipeIngredientsDetailsReadSerializer
         return RecipeIngredientsDetailsCreateSerializer
 
@@ -45,7 +45,7 @@ class RecipeViewSet(ModelViewSet):
                           IsAuthorOrIsStaffOrReadOnly]
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ["list", "retrieve"]:
             return RecipeReadSerializer
         return RecipeCreateSerializer
 
@@ -130,10 +130,9 @@ def get_shopping_cart(request):
 
     response = HttpResponse(text,
                             content_type="application/text charset=utf-8")
-    response['Content-Disposition'] = ("attachment; "
+    response["Content-Disposition"] = ("attachment; "
                                        "filename=\"shopping-cart.txt\"")
     return response
-
 
 
 @api_view(["GET", "DELETE"])

@@ -1,5 +1,4 @@
 from colorfield.fields import ColorField
-
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
@@ -36,7 +35,7 @@ class Tag(models.Model):
     color = ColorField(
         verbose_name="Цвет",
         help_text="Выберите цветовой HEX-код (пример: #FF0033)",
-        default = "#888888",
+        default="#888888",
         max_length=200,
         validators=[RegexValidator(regex=r"#[0-9a-fA-F]{6}")],
     )
@@ -155,7 +154,7 @@ class RecipeFavourite(models.Model):
     )
 
     class Meta:
-        unique_together = [['user', 'recipe']]
+        unique_together = [["user", "recipe"]]
         verbose_name = "Избранное"
         verbose_name_plural = "Избранное"
 
@@ -179,7 +178,7 @@ class RecipeShoppingCart(models.Model):
     )
 
     class Meta:
-        unique_together = [['user', 'recipe']]
+        unique_together = [["user", "recipe"]]
         verbose_name = "Список покупок"
         verbose_name_plural = "Списки покупок"
 
