@@ -11,6 +11,22 @@ Foodgram является дипломным проектом в рамках к
 docker-compose up
 ```
 
+Далее необходимо сделать миграции базы данных и собрать статику:
+
+```
+docker-compose exec web python manage.py migrate --noinput
+docker-compose exec web python manage.py collectstatic --no-input 
+```
+Создание суперпользователя:
+```
+docker-compose exec web python manage.py createsuperuser
+```
+При необходимости можно загрузить тестовые данные (файл `dump.json` находится в 
+директории `data/`, поэтому его необходимо предварительно скопировать в 
+директорию `backend/`):
+```
+docker-compose exec web python manage.py loaddata dump.json
+```
 Сайт сервиса будет доступен по адресу: http://localhost.
 
 Корень API доступен по адресу: http://localhost/api/.
