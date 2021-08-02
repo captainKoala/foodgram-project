@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/users/<int:author_id>/subscribe/',
          subscribe,
          name='subscribe'),
+    path("select2/", include("django_select2.urls")),
 ]

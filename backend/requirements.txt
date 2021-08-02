@@ -79,15 +79,24 @@ cryptography==3.4.7; python_full_version >= "3.6.1" and python_full_version < "4
 defusedxml==0.7.1; python_full_version >= "3.6.1" and python_full_version < "4.0.0" and python_version >= "3.6" \
     --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61 \
     --hash=sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69
+django-appconf==1.0.4 \
+    --hash=sha256:be58deb54a43d77d2e1621fe59f787681376d3cd0b8bd8e4758ef6c3a6453380 \
+    --hash=sha256:1b1d0e1069c843ebe8ae5aa48ec52403b1440402b320c3e3a206a0907e97bb06
 django-cleanup==5.2.0 \
     --hash=sha256:909d10ff574f5ce1a40fa63bd5c94c9ed866fd7ae770994c46cdf66c3db3e846 \
     --hash=sha256:193cf69de54b9fc0a0f4547edbb3a63bbe01728cb029f9f4b7912098cc1bced7
 django-colorfield==0.4.2 \
     --hash=sha256:5624a23e2fe97066f45e56eedf9672ab545aa5e52a790cfc33a5f29160a70684 \
     --hash=sha256:7f907e11ed053b60d3316199446d76e889caeb27e980fe10cc2d8a825bc84e3a
+django-select2==7.7.1 \
+    --hash=sha256:dd091342e99436818b3fa98783ae6c24fb2a0cbc37ebd3faa0aef68422b6e416 \
+    --hash=sha256:8c54984bb931d842eab6a46d1b427c6883e5f5347529cda27dcd942fb37d87b9
 django-templated-mail==1.1.1; python_full_version >= "3.6.1" and python_full_version < "4.0.0" \
     --hash=sha256:8db807effebb42a532622e2d142dfd453dafcd0d7794c4c3332acb90656315f9 \
     --hash=sha256:f7127e1e31d7cad4e6c4b4801d25814d4b8782627ead76f4a75b3b7650687556
+django-wkhtmltopdf==3.3.0 \
+    --hash=sha256:e4c42d771c7a1ef85faa0591e3c1fa7da3ef0d39a636baea4a1ec89bf7119a71 \
+    --hash=sha256:add8cbf6266a28bcc3691775dbe2f2eff7934f2c7fe9995b320270f3679f12b4
 django==3.2.5; python_version >= "3.6" \
     --hash=sha256:c58b5f19c5ae0afe6d75cbdd7df561e6eb929339985dbbda2565e1cabb19a62e \
     --hash=sha256:3da05fea54fdec2315b54a563d5b59f3b4e2b1e69c3a5841dda35019c01855cd

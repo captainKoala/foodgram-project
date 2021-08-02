@@ -9,7 +9,7 @@ from . import data
 
 class UserCreateTestCase(APITestCase):
     def test_create_user(self):
-        # ПРОВЕРКА СОЗДАНИЯ ПОЛЬЗОВАТЕЛЯ
+        """Проверка создания пользователя."""
         data_1 = data.USER_DATA_1
         response = self.client.post(data.USERS_URL, data_1, format="json")
         self.assertNotEqual(response.status_code,

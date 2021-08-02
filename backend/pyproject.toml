@@ -15,6 +15,8 @@ gunicorn = "^20.1.0"
 psycopg2-binary = "^2.9.1"
 django-colorfield = "^0.4.2"
 reportlab = "^3.5.68"
+django-wkhtmltopdf = "^3.3.0"
+django-select2 = "^7.7.1"
 
 [tool.poetry.dev-dependencies]
 

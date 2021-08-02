@@ -7,11 +7,11 @@ class User(AbstractUser):
         verbose_name="Имя пользователя",
         max_length=150,
         unique=True,
-        help_text='Введите имя пользователя '
-                  '(Только буквы, цифры и символы @/./+/-/_ )',
+        help_text="Введите имя пользователя "
+                  "(Только буквы, цифры и символы @/./+/-/_ )",
         validators=[UnicodeUsernameValidator()],
         error_messages={
-            'unique': "Пользователь с таким логином уже существует.",
+            "unique": "Пользователь с таким логином уже существует.",
         },
     )
     first_name = models.CharField(

@@ -1,6 +1,7 @@
 from django.db import IntegrityError
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import get_template
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
@@ -8,6 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from wkhtmltopdf.views import PDFTemplateResponse
 
 from users.models import User
 
@@ -61,13 +63,14 @@ class RecipeViewSet(ModelViewSet):
 
         if tags:
             queryset = queryset.filter(tags__slug__in=tags).distinct()
+        elif not is_in_shopping_cart:
+            return Recipe.objects.none()
         if author_id:
             queryset = queryset.filter(author_id=author_id)
         if is_favorited:
             queryset = queryset.filter(favourites__user=user)
         if is_in_shopping_cart:
             queryset = queryset.filter(to_shopping__user=user)
-
         return queryset
 
 
@@ -112,6 +115,7 @@ def get_shopping_cart(request):
         return Response({"detail": "Учетные данные не были предоставлены."},
                         status=status.HTTP_403_FORBIDDEN)
     shopping_cart = RecipeShoppingCart.objects.filter(user=user)
+
     purchases = {}
     for cart in shopping_cart:
         recipe_ingredients = RecipeIngredientsDetails.objects.filter(
@@ -124,15 +128,15 @@ def get_shopping_cart(request):
                 purchases[name] += amount
             else:
                 purchases[name] = amount
-    text = "СПИСОК ПОКУПОК\n"
-    for key, value in purchases.items():
-        text += f"{key} - {value}\n"
 
-    response = HttpResponse(text,
-                            content_type="application/text charset=utf-8")
-    response["Content-Disposition"] = ("attachment; "
-                                       "filename=\"shopping-cart.txt\"")
-    return response
+    template = get_template("shopping_cart.html")
+    return PDFTemplateResponse(request=request,
+                               template=template,
+                               filename="shopping_cart.pdf",
+                               context={"purchases": purchases},
+                               show_content_in_browser=False,
+                               cmd_options={'margin-top': 50, },
+                               )
 
 
 @api_view(["GET", "DELETE"])

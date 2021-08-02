@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     # удаление файлов и изображений при удалении записи в БД
     'django_cleanup.apps.CleanupConfig',
     'colorfield',
+    'django_select2',
+    'wkhtmltopdf',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +132,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

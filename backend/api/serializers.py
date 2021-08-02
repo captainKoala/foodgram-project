@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField, ReadOnlyField,
-                                        SerializerMethodField)
+                                        SerializerMethodField, ValidationError)
 
 from .models import (Ingredient, Recipe, RecipeFavourite,
                      RecipeIngredientsDetails, RecipeShoppingCart, Tag, User,
@@ -15,7 +15,11 @@ class IngredientSerializer(ModelSerializer):
         fields = ["id", "name", "measurement_unit"]
 
     def to_internal_value(self, data):
-        return Ingredient.objects.get(id=data)
+        try:
+            ingredient = Ingredient.objects.get(id=data)
+        except Ingredient.DoesNotExist:
+            raise ValidationError({f"Ингредиента с id={data} не существует."})
+        return ingredient
 
 
 class RecipeIngredientsDetailsReadSerializer(ModelSerializer):
@@ -81,7 +85,6 @@ class RecipeReadSerializer(ModelSerializer):
 
 
 class RecipeCreateSerializer(ModelSerializer):
-    tags = TagSerializer(many=True)
     ingredients = RecipeIngredientsDetailsCreateSerializer(many=True)
     image = Base64ImageField(max_length=None, use_url=True)
     author = PrimaryKeyRelatedField(read_only=True)
@@ -90,13 +93,40 @@ class RecipeCreateSerializer(ModelSerializer):
         model = Recipe
         exclude = ["pub_date"]
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if not is_valid:
+            errors = self.errors.copy()
+            if "ingredients" in errors:
+                ingredient_errors = errors["ingredients"]
+                new_ingredient_errors = []
+                for error in ingredient_errors:
+                    if error != {}:
+                        for key, values in error.items():
+                            for value in values:
+                                new_ingredient_errors.append(
+                                    f"'{key}': {value}")
+                errors["ingredients"] = new_ingredient_errors
+            raise ValidationError(errors)
+        return is_valid
+
+    def validate(self, data):
+        data = super().validate(data)
+
+        ingredients = data["ingredients"]
+        ingredients_ids = [ingredient["id"] for ingredient in ingredients]
+        if len(ingredients) != len(set(ingredients_ids)):
+            raise ValidationError(
+                {"detail": "В рецепт нельзя добавлять одни и те ингредиенты "
+                           "несколько раз."})
+        return data
+
     def create(self, validated_data):
         tags = validated_data.pop("tags")
         ingredients = validated_data.pop("ingredients")
 
         recipe = Recipe.objects.create(**validated_data,
                                        author=self.context["request"].user)
-
         recipe.tags.set(tags)
 
         recipe_ingredients = []
