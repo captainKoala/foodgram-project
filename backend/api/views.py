@@ -1,5 +1,4 @@
 from django.db import IntegrityError
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
 from django_filters import rest_framework as filters
@@ -32,6 +31,7 @@ from .serializers import (CustomUserSerializer, IngredientSerializer,
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
+    """Получение ингредиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -110,7 +110,7 @@ class RecipeFavouriteViewSet(RecipeUserRelationsCreateDestroyViewSet):
 
 class ShoppingCartViewSet(RecipeUserRelationsCreateDestroyViewSet,
                           ListModelMixin):
-    """Добавление и удаление рецпта из списка покупок."""
+    """Добавление и удаление рецепта из списка покупок."""
     queryset = RecipeShoppingCart.objects.order_by("-recipe__pub_date")
     serializer_class = ShoppingCartSerializer
 

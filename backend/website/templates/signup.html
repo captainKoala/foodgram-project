@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block main %}
+    <div class="container text-dark">
+        <div class="row mt-5 mb-2">
+            <h1 class="col-md-6">Регистрация</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <form class="col-md-6 border rounded my-5 p-5 shadow" method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group row">
+                    <label for="emailInput" class="col-4">{{ field.label }}</label>
+                    <div class="col-8">
+                        {{ field }}
+    {#                    <input type="email" class="form-control" id="emailInput" required>#}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="form-group row d-flex justify-content-center align-items-center">
+                    <button type="submit" class="btn btn-primary mx-3">Зарегистрироваться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

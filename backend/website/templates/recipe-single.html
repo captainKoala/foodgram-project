@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }}{% endblock %}
+
+{% block main %}
+<div class="container text-dark">
+    <div class="row mt-5 mb-2">
+        <div class="col-md-5">
+            <img src="{{ recipe.image }}" alt="{{ recipe.name }}"
+                 class="img-fluid rounded">
+        </div>
+        <div class="col-md-7">
+            <h1 class="mb-2">{{ recipe.name }}</h1>
+            <div class="mt-4">
+                {% include "recipe-tags-list.html" %}
+            </div>
+            <div class="mt-4">
+                {% include "recipe-cooking-time.html" %}
+            </div>
+            <div class="mt-4">
+                {% include "recipe-author.html" %}
+            </div>
+            <h2 class="mt-4">Ингредиенты</h2>
+            <table class="table table-striped mt-4">
+                {% for ingredient in recipe.ingredients %}
+                    <tr>
+                        <td>{{ ingredient.name|capfirst }}</td>
+                        <td>{{ ingredient.amount }}</td>
+                        <td>{{ ingredient.measurement_unit }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <h2 class="mt-4">Описание</h2>
+            <p>{{ recipe.text|linebreaks }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

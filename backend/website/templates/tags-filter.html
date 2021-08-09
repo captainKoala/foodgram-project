@@ -1,0 +1,29 @@
+<!-- ФИЛЬТР ПО ТЕГАМ -->
+<ul class="tags-filter col-md-6 d-flex justify-content-center justify-content-md-end">
+    {% for tag in tags %}
+        <li class="tags-filter-item p-2">
+            {% if tag.slug in selected_tags or "__all__" in selected_tags %}
+                <a href="#" style="color:{{ tag.color }};"
+                   class="d-flex align-items-center" data-slug="{{ tag.slug }}"
+                   data-isselected="true">
+                        {% include "icons/check-circle-fill.svg" %}
+                        <span class="ml-1">
+                            {{ tag.name }}
+                        </span>
+                </a>
+            {% else %}
+                <a href="#" style="color:{{ tag.color }};"
+                   class="d-flex align-items-center" data-slug="{{ tag.slug }}"
+                   data-isselected="false">
+                        {% include "icons/circle.svg" %}
+                        <span class="ml-1">
+                            {{ tag.name }}
+                        </span>
+                </a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+{% load static %}
+<script src="{% static 'js/tags-filter.js' %}"></script>

@@ -1,0 +1,10 @@
+<!-- список тегов -->
+<div class="tags-list d-flex flex-wrap my-2">
+    {% for tag in recipe.tags %}
+    <a href="{% url "web-recipes-list" %}?tags={{ tag.slug }}"
+       class="tags-list-item tags-list-item-bfst mr-2 mb-2
+        px-3 py-1 rounded"
+       style="color:{{ tag.color }};">
+        <b>{{ tag.name }}</b></a>
+    {% endfor %}
+</div>
