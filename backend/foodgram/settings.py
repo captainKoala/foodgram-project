@@ -20,7 +20,6 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
 # Application definition
 
 INSTALLED_APPS = [
-    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,13 +28,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
-    'api',
-    # удаление файлов и изображений при удалении записи в БД
-    'django_cleanup.apps.CleanupConfig',
+
     'colorfield',
+    'django_cleanup.apps.CleanupConfig',
+    'django_filters',
     'django_select2',
+    'djoser',
     'wkhtmltopdf',
+
+    'api',
+    'users',
+    'website',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +61,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
+                'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -73,20 +77,20 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-#    'default': {
-#        'ENGINE': os.environ.get('DB_ENGINE',
-#                                 default='django.db.backends.postgresql'),
-#        'NAME': os.environ.get('DB_NAME',
-#                              default=os.path.join(BASE_DIR, 'postgres')),
-#        'USER': os.environ.get('POSTGRES_USER'),
-#        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-#        'HOST': os.environ.get('DB_HOST'),
-#        'PORT': os.environ.get('DB_PORT'),
-#    }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'ENGINE': os.environ.get('DB_ENGINE',
+                                 default='django.db.backends.postgresql'),
+        'NAME': os.environ.get('DB_NAME',
+                              default=os.path.join(BASE_DIR, 'postgres')),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'db.sqlite3',
+    # }
 }
 
 
@@ -132,10 +136,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = ''
+STATICFILES_DIRS = (os.path.join('static'), )
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "index"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -145,6 +154,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'SEARCH_PARAM': 'name',
     'DEFAULT_PAGINATION_CLASS':

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Рецепты{% endblock %}
+
+{% block main %}
+    <div class="container text-dark">
+        <div class="row mt-5 mb-2">
+            <h1 class="col-md-6">Рецепты</h1>
+            <!-- ФИЛЬТР ПО ТЕГАМ -->
+            <ul class="tags-filter col-md-6 d-flex justify-content-center justify-content-md-end">
+            {% for tag in tags %}
+               <li class="tags-filter-item p-2">{{ tag.name }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="row recipe-list">
+            {% for recipe in recipes %}
+            <!-- КАРТОЧКА РЕЦЕПТА -->
+            <div class="card-wrapper col-12 col-md-6 col-lg-4 p-2">
+                <div class="card">
+                    <img class="card-img-top" src="{{ recipe.image }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ recipe.name }}</h2>
+                        <div class="tags-list d-flex flex-wrap my-2">
+                            {% for tag in recipe.tags %}
+                            <span class="tags-list-item tags-list-item-bfst mr-2 mb-2 px-3 py-1 rounded">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="cooking-time my-2">{{ recipe.cooking_time }} мин.</div>
+                        <div class="author my-2">
+                            {{ recipe.author.first_name }} {{ recipe.author.last_name }}
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-8">
+                                <a href="#" class="btn btn-primary">Добавить в покупки </a>
+                            </div>
+                            <div class="col-4 in-favorite text-right"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container paginator d-flex justify-content-center">
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center">&lt;</a>
+        <a href="#" class="badge badge-pill badge-primary m-1 d-flex align-items-center justify-content-center">1</a>
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center justify-content-center">2</a>
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center justify-content-center">3</a>
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center justify-content-center">4</a>
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center justify-content-center">5</a>
+        <a href="#" class="badge badge-pill badge-light m-1 d-flex align-items-center justify-content-center">&gt;</a>
+    </div>
+{% endblock %}

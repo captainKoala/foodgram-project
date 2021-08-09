@@ -6,6 +6,7 @@ from users.models import User
 
 
 class Ingredient(models.Model):
+    """Ингредиент для рецепта."""
     name = models.CharField(
         verbose_name="Название",
         help_text="Введите название ингридиента",
@@ -13,7 +14,7 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         verbose_name="Единица измерения",
-        help_text="Введите единицу измерения",
+        help_text="Введите единицу измерения ингредиента",
         max_length=200,
     )
 
@@ -26,6 +27,7 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
+    """Тег для фильтрации рецептов."""
     name = models.CharField(
         verbose_name="Название",
         help_text="Введите тег",
@@ -37,9 +39,10 @@ class Tag(models.Model):
         help_text="Выберите цветовой HEX-код (пример: #FF0033)",
         default="#888888",
         max_length=200,
-        validators=[RegexValidator(regex=r"#[0-9a-fA-F]{6}",
-                                   message="Цвет должен быть задан в "
-                                           "формате hex-кода")],
+        validators=[
+            RegexValidator(regex=r"#[0-9a-fA-F]{6}",
+                           message="Цвет должен быть задан в "
+                                   "формате hex-кода")],
     )
     slug = models.SlugField(
         verbose_name="Slug",
@@ -56,6 +59,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Рецепт"""
     author = models.ForeignKey(
         User,
         verbose_name="Автор",
@@ -110,7 +114,7 @@ class Recipe(models.Model):
 
 
 class RecipeIngredientsDetails(models.Model):
-    """ Описывает количество для каждого ингридиента в рецепте."""
+    """Описывает количество для каждого ингридиента в рецепте."""
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="Рецепт",
@@ -141,7 +145,7 @@ class RecipeIngredientsDetails(models.Model):
 
 
 class RecipeFavourite(models.Model):
-    """ Добавление рецепта в избранное. """
+    """ Добавление рецепта в избранное."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

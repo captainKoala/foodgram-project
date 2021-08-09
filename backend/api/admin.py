@@ -24,11 +24,6 @@ class RecipeIngredientsDetailsInline(admin.TabularInline):
     model = RecipeIngredientsDetails
     extra = 1
 
-    # def formfield_for_dbfield(self, db_field, request, **kwargs):
-    #     if db_field.name == "ingredient":
-    #         kwargs["widget"] = IngredientWidget
-    #     return super().formfield_for_dbfield(db_field, request, **kwargs)
-
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
@@ -46,9 +41,11 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeFavourite)
 class RecipeFavouriteAdmin(admin.ModelAdmin):
-    list_display = ("user", "recipe")
+    list_display = ("user", "recipe", )
+    list_filter = ("user",)
 
 
 @admin.register(RecipeShoppingCart)
 class RecipeShoppingCartAdmin(admin.ModelAdmin):
     list_display = ("user", "recipe")
+    list_filter = ("user",)

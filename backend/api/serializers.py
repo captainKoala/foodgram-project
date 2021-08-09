@@ -232,3 +232,31 @@ class CustomUserShortSerializer(UserSerializer):
         if user.is_anonymous:
             return False
         return UserFollow.objects.filter(user=user, follow_to=obj).exists()
+
+
+class RecipeFavouriteSerializer(ModelSerializer):
+    class Meta:
+        model = RecipeFavourite
+        fields = ("user", "recipe", )
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.recipe.id,
+            "name": instance.recipe.name,
+            "image": instance.recipe.image.url,
+            "cooking_time": instance.recipe.cooking_time,
+        }
+
+
+class ShoppingCartSerializer(ModelSerializer):
+    class Meta:
+        model = RecipeShoppingCart
+        fields = ("user", "recipe", )
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.recipe.id,
+            "name": instance.recipe.name,
+            "image": instance.recipe.image.url,
+            "cooking_time": instance.recipe.cooking_time,
+        }
