@@ -208,6 +208,8 @@ class UserFollow(models.Model):
 
     class Meta:
         unique_together = [["user", "follow_to"]]
+        verbose_name = "Подписки на авторов"
+        verbose_name_plural = "Подписки на авторов"
 
     def __str__(self):
         return f"{self.user} - {self.follow_to}"

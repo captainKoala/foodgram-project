@@ -27,7 +27,8 @@ from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeIngredientsDetailsCreateSerializer,
                           RecipeIngredientsDetailsReadSerializer,
                           RecipeFavouriteSerializer, RecipeReadSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+                          ShoppingCartSerializer, TagSerializer,
+                          UserFollowSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -40,6 +41,9 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeIngredientDetailsViewSet(ModelViewSet):
+    """Управление списком ингредиентов для рецепта (ингредиент и его
+    количество в рецепте).
+    """
     queryset = RecipeIngredientsDetails.objects.all()
 
     def get_serializer_class(self):
@@ -49,6 +53,7 @@ class RecipeIngredientDetailsViewSet(ModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
+    """Создание, получение и удаление рецептов."""
     queryset = Recipe.objects.all().order_by("-pub_date")
     pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticatedOrReadOnly,
@@ -63,14 +68,15 @@ class RecipeViewSet(ModelViewSet):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
+    """Получение тегов."""
     pagination_class = None
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class RecipeUserRelationsCreateDestroyViewSet(GenericViewSet, CreateModelMixin,
-                                              RetrieveModelMixin,
-                                              DestroyModelMixin):
+class RecipeUserRelationsViewSet(GenericViewSet, CreateModelMixin,
+                                 RetrieveModelMixin,
+                                 DestroyModelMixin):
     """
     Добавление и удаление модели, связывающей модели User и Recipe.
     Необходимо добавить queryset, serializer_class
@@ -99,7 +105,7 @@ class RecipeUserRelationsCreateDestroyViewSet(GenericViewSet, CreateModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class RecipeFavouriteViewSet(RecipeUserRelationsCreateDestroyViewSet):
+class RecipeFavouriteViewSet(RecipeUserRelationsViewSet):
     """Добавление рецепта в избранное и удаление рецепта из избранного."""
     queryset = RecipeFavourite.objects.order_by("-recipe__pub_date")
     serializer_class = RecipeFavouriteSerializer
@@ -108,7 +114,7 @@ class RecipeFavouriteViewSet(RecipeUserRelationsCreateDestroyViewSet):
         model = RecipeFavourite
 
 
-class ShoppingCartViewSet(RecipeUserRelationsCreateDestroyViewSet,
+class ShoppingCartViewSet(RecipeUserRelationsViewSet,
                           ListModelMixin):
     """Добавление и удаление рецепта из списка покупок."""
     queryset = RecipeShoppingCart.objects.order_by("-recipe__pub_date")
@@ -146,37 +152,36 @@ class ShoppingCartViewSet(RecipeUserRelationsCreateDestroyViewSet,
                                    cmd_options={'margin-top': 50, },
                                    )
 
-@api_view(["GET", "DELETE"])
-def subscribe(request, author_id):
-    author = get_object_or_404(User, id=author_id)
-    user = request.user
 
-    if author == user:
-        return Response({"errors": "Нельзя подписаться на себя"},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    if request.method == "GET":
-        try:
-            UserFollow.objects.create(user=user, follow_to=author)
-        except IntegrityError:
-            return Response(
-                {"errors": "Вы уже подписаны на этого пользователя"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        serializer = CustomUserSerializer(user, context={"request": request})
-        return Response(serializer.data)
-
-    # DELETE
-    subscription = get_object_or_404(UserFollow, user=user, follow_to=author)
-    subscription.delete()
-    return Response({"detail": "Подписка отменена"},
-                    status=status.HTTP_204_NO_CONTENT)
-
-
-class SubscriptionsViewSet(ReadOnlyModelViewSet):
+class SubscriptionsViewSet(ModelViewSet):
+    """Управление подпиской на пользователя."""
     pagination_class = PageNumberPagination
-    serializer_class = CustomUserSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def get_serializer_class(self):
+        if self.action in ("list", "retrieve"):
+            return CustomUserSerializer
+        return UserFollowSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return User.objects.filter(followers__user=user)
+        return User.objects.filter(followers__user=user).order_by("id")
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data["user"] = request.user.id
+        data["follow_to"] = kwargs.get("author_id")
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = get_object_or_404(UserFollow,
+                                     user=request.user.id,
+                                     follow_to=kwargs.get("author_id"))
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -260,3 +260,15 @@ class ShoppingCartSerializer(ModelSerializer):
             "image": instance.recipe.image.url,
             "cooking_time": instance.recipe.cooking_time,
         }
+
+
+class UserFollowSerializer(ModelSerializer):
+    class Meta:
+        model = UserFollow
+        fields = ("user", "follow_to")
+
+    def to_representation(self, instance):
+        return CustomUserSerializer(
+            instance.follow_to,
+            context={"request": self.context.get("request")}
+        ).data

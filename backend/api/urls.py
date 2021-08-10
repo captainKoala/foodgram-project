@@ -2,8 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (IngredientViewSet, RecipeViewSet, SubscriptionsViewSet,
-                    TagViewSet, RecipeFavouriteViewSet, ShoppingCartViewSet,
-                    subscribe)
+                    TagViewSet, RecipeFavouriteViewSet, ShoppingCartViewSet)
 
 api_v1_router = DefaultRouter()
 api_v1_router.register('ingredients', IngredientViewSet,
@@ -29,7 +28,8 @@ urlpatterns = [
          SubscriptionsViewSet.as_view({'get': 'list'}),
          name='subscriptions'),
     path('api/users/<int:author_id>/subscribe/',
-         subscribe,
+         SubscriptionsViewSet.as_view({'get': 'create',
+                                       'delete': 'destroy'}),
          name='subscribe'),
     path("select2/", include("django_select2.urls")),
 ]

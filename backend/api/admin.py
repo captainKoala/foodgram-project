@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django_select2 import forms as s2forms
 
 from .models import (Ingredient, Recipe, RecipeFavourite,
-                     RecipeIngredientsDetails, RecipeShoppingCart, Tag)
+                     RecipeIngredientsDetails, RecipeShoppingCart, Tag,
+                     UserFollow)
 
 
 @admin.register(Ingredient)
@@ -10,14 +10,6 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_display = ("name",)
     list_filter = ("name",)
-
-
-class IngredientWidget(s2forms.ModelSelect2Widget):
-    search_fields = ["name__icontains"]
-    queryset = Ingredient.objects.all()
-
-    class Media:
-        js = ("admin/js/vendor/jquery/jquery.min.js",)
 
 
 class RecipeIngredientsDetailsInline(admin.TabularInline):
@@ -49,3 +41,9 @@ class RecipeFavouriteAdmin(admin.ModelAdmin):
 class RecipeShoppingCartAdmin(admin.ModelAdmin):
     list_display = ("user", "recipe")
     list_filter = ("user",)
+
+
+@admin.register(UserFollow)
+class UserFollowAdmin(admin.ModelAdmin):
+    list_display = ("user", "follow_to")
+    list_filter = ("user", "follow_to")
