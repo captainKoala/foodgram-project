@@ -1,0 +1,20 @@
+<!-- кнопка добаления в избранное -->
+<!-- для использования необходимо подключить buttons.js -->
+<div>
+    <a href="#"
+       title="Удалить из избранного"
+       class="in-favorite {% if recipe not in favorite_recipes %}d-none{% endif %}"
+       id="remove-from-favorite-{{ recipe.id }}"
+       data-recipeid="{{ recipe.id }}"
+       data-is_selected="true">
+        {% include "icons/star-fill.svg" %}
+    </a>
+    <a href="#"
+       title="Добавить в избранное"
+       class="in-favorite {% if recipe in favorite_recipes %}d-none{% endif %}"
+       id="add-to-favorite-{{ recipe.id }}"
+       data-recipeid="{{ recipe.id }}"
+       data-is_selected="false">
+        {% include "icons/star.svg" %}
+    </a>
+</div>

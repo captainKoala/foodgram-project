@@ -5,24 +5,53 @@
 {% block main %}
 <div class="container text-dark">
     <div class="row mt-5 mb-2">
-        <div class="col-md-5">
-            <img src="{{ recipe.image }}" alt="{{ recipe.name }}"
-                 class="img-fluid rounded">
+        <div class="col-lg-5">
+            <img src="{{ MEDIA_URL }}{{ recipe.image }}" alt="{{ recipe.name }}"
+                 class="img-fluid w-100 rounded">
         </div>
-        <div class="col-md-7">
-            <h1 class="mb-2">{{ recipe.name }}</h1>
+        <div class="col-lg-7 mt-5 mt-lg-0">
+            <div class="row mb-2">
+                <h1 class="col-10">{{ recipe.name }}</h1>
+                <!-- кнопка избранного -->
+                {% if user.is_authenticated %}
+                    <div class="col2">
+                        {% include "recipe-btn-add-to-favorites.html" %}
+                    </div>
+                {% endif %}
+            </div>
+            <!-- список тегов -->
             <div class="mt-4">
                 {% include "recipe-tags-list.html" %}
             </div>
+            <!-- время приготовления -->
             <div class="mt-4">
                 {% include "recipe-cooking-time.html" %}
             </div>
-            <div class="mt-4">
-                {% include "recipe-author.html" %}
+            <!-- автор -->
+            <div class="mt-4 row">
+                <div class="col">
+                    {% include "recipe-author.html" %}
+                </div>
+                {% if user.id == recipe.author.id or user.is_staff %}
+                    <div class="col">
+                        <a href="" class="btn btn-light text-dark">Редактировать рецепт</a>
+                    </div>
+                {% endif %}
             </div>
+            <!-- кнопки подписок -->
+            {% if user.is_authenticated %}
+                <div class="mt-4 row">
+                    <div class="col">
+                        {% include "recipe-btn-add-to-shooping-cart.html" %}
+                    </div>
+                    <div class="col">
+                        {% include "recipe-btn-follow-author.html" %}
+                    </div>
+                </div>
+            {% endif %}
             <h2 class="mt-4">Ингредиенты</h2>
             <table class="table table-striped mt-4">
-                {% for ingredient in recipe.ingredients %}
+                {% for ingredient in recipe.ingredients.all %}
                     <tr>
                         <td>{{ ingredient.name|capfirst }}</td>
                         <td>{{ ingredient.amount }}</td>
@@ -35,4 +64,9 @@
         </div>
     </div>
 </div>
+
+{% load static %}
+<script src="{% static 'js/buttons.js' %}"></script>
+
 {% endblock %}
+

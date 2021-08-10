@@ -1,6 +1,6 @@
 <!-- автор -->
-<div class="author my-2">
-    <a href="{{ recipe.author.id }}">
+<div class="author">
+    <a href="/users/{{ recipe.author.id}}/">
         {% include "icons/person.svg" %}
         <span class="ml-2">{{ recipe.author.first_name }}
             {{ recipe.author.last_name }}</span>

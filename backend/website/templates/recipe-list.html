@@ -4,12 +4,14 @@
     <!-- КАРТОЧКА РЕЦЕПТА -->
     <div class="card-wrapper col-12 col-md-6 col-lg-4 p-2">
         <div class="card">
-            <a href="{% url 'web-recipes-list' %}{{ recipe.id }}/">
-                <img class="card-img-top" src="{{ recipe.image }}"
-                     alt="{{ recipe.name }}">
+            <!-- изображение-ссылка -->
+            <a href="{% url 'web-recipes' %}{{ recipe.id }}/">
+                <div class="card-img-top card-img-top-bg"
+                     style="background-image: url('{{ MEDIA_URL }}{{ recipe.image }}')">
+                </div>
             </a>
             <div class="card-body">
-                <a href="{% url 'web-recipes-list' %}{{ recipe.id }}" class="text-dark">
+                <a href="{% url 'web-recipes' %}{{ recipe.id }}" class="text-dark">
                     <h2 class="card-title">{{ recipe.name }}</h2>
                 </a>
                 <!-- список тегов -->
@@ -18,127 +20,24 @@
                 <!-- время приготовления -->
                 {% include "recipe-cooking-time.html" %}
                 <!-- автор -->
-                {% include "recipe-author.html" %}
-
-                <div class="row mt-4">
-                    <!-- кнопка добаления в список покупок -->
-                    <div class="col-10">
-                        <a href="#"
-                           class="btn btn-primary btn-shopping-cart
-                                {% if not recipe.is_in_shopping_cart %}d-none{% endif %}"
-                                data-recipeid="{{ recipe.id }}"
-                                data-is_selected="true">
-                            {% include "icons/plus-lg.svg" %}
-                            Добавить в покупки</a>
-                        <a href="#"
-                           class="btn btn-primary btn-shopping-cart
-                                    {% if recipe.is_in_shopping_cart %}d-none{% endif %}"
-                                data-recipeid="{{ recipe.id }}"
-                                data-is_selected="false">
-                            {% include "icons/check-lg.svg" %}
-                            Рецепт добавлен</a>
+                    {% include "recipe-author.html" %}
+                {% if user.is_authenticated %}
+                    <div class="row mt-4">
+                        <!-- кнопка добаления в список покупок -->
+                        <div class="col-10">
+                            {% include "recipe-btn-add-to-shooping-cart.html" %}
+                        </div>
+                        <!-- кнопка добаления в избранное -->
+                        <div class="col-2 text-right">
+                            {% include "recipe-btn-add-to-favorites.html" %}
+                        </div>
                     </div>
-                    <!-- кнопка добаления в избранное -->
-                    <div class="col-2 text-right">
-                            <a href="#"
-                               class="in-favorite {% if not recipe.is_favorited %}d-none{% endif %}"
-                               id="remove-from-favorite-{{ recipe.id }}"
-                               data-recipeid="{{ recipe.id }}"
-                               data-is_selected="true">
-                                {% include "icons/star-fill.svg" %}
-                            </a>
-
-                            <a href="#"
-                               class="in-favorite {% if recipe.is_favorited %}d-none{% endif %}"
-                               id="add-to-favorite-{{ recipe.id }}"
-                               data-recipeid="{{ recipe.id }}"
-                               data-is_selected="false">
-                                {% include "icons/star.svg" %}
-                            </a>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
 
-<script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    const makeFetch = async (request, options)  => {
-        return fetch(request, options)
-            .then(async response => {
-                if (response.status === 201)
-                    return response.json();
-                if (response.status === 204)
-                    return {"detail": "Запись удалена."}
-                if (!response.ok)
-                    response = await response.text()
-                    return {"error": "Произошла ошибка " + response}
-            })
-            .catch(error => console.log("Error: " + error))
-    }
-
-    const toggleButtonsHandler = (currentBtn, url) => {
-        const csrftoken = getCookie('csrftoken');
-        const request = new Request(
-            url, {headers: {"X-CSRFToken": csrftoken}});
-
-        let options = currentBtn.dataset.is_selected === "true" ?
-            {method: "DELETE", mode: "same-origin"} :
-            {method: "GET", mode: "same-origin"};
-
-        makeFetch(request, options)
-                .then(response => {
-                    if (response["error"])
-                        console.log(response["error"])
-                    else
-                        for (let elem of currentBtn.parentElement.children)
-                            elem.classList.toggle("d-none");
-                })
-    }
-
-    const shoppingCartHandler = (event) => {
-        event.preventDefault();
-
-        const currentBtn = event.target.closest("a");
-        const recipeID = currentBtn.dataset.recipeid;
-        const url = `/recipes/${recipeID}/shopping_cart/`;
-
-        toggleButtonsHandler(currentBtn, url);
-
-    }
-
-    const favoritesHandler = event => {
-        event.preventDefault();
-
-        const currentBtn = event.target.closest("a");
-        const recipeID = currentBtn.dataset.recipeid;
-        const url = `/recipes/${recipeID}/favorite/`;
-
-        toggleButtonsHandler(currentBtn, url);
-    }
-
-    const favoriteButtons = document.querySelectorAll(".in-favorite");
-    const shoppingCartButtons = document.querySelectorAll(".btn-shopping-cart");
-
-    for (let btn of favoriteButtons)
-        btn.addEventListener("click", favoritesHandler);
-    for (let btn of shoppingCartButtons)
-        btn.addEventListener("click", shoppingCartHandler);
-</script>
+{% load static %}
+<script src="{% static 'js/buttons.js'%}"></script>

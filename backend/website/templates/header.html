@@ -12,7 +12,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link"
-                           href="{% url 'web-recipes-list' %}">Рецепты</a>
+                           href="{% url 'web-recipes' %}">Рецепты</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
@@ -25,12 +25,20 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
-                               href="{% url 'web-recipes-list' %}?is_favorited=true">
-                                Избранное</a>
+                               href="{% url 'web-favorite-recipes' %}">
+                                Избранное
+                                {% if favorite_recipes %}
+                                    ({{ favorite_recipes.count }})
+                                {% endif %}
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
-                               href="#">Список покупок</a>
+                               href="#">Список покупок
+                                {% if shopping_cart %}
+                                    ({{ shopping_cart.count }})
+                                {% endif %}
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
