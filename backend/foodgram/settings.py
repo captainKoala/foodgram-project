@@ -14,8 +14,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY',
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
-                               default='localhost 127.0.0.1').split(' ')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.5']
+# ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS',
+#                                default='localhost 127.0.0.1').split(' ')
 
 # Application definition
 
@@ -32,7 +33,6 @@ INSTALLED_APPS = [
     'colorfield',
     'django_cleanup.apps.CleanupConfig',
     'django_filters',
-    'django_select2',
     'djoser',
     'wkhtmltopdf',
 
@@ -77,20 +77,20 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get('DB_ENGINE',
-                                 default='django.db.backends.postgresql'),
-        'NAME': os.environ.get('DB_NAME',
-                              default=os.path.join(BASE_DIR, 'postgres')),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
-    }
     # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': 'db.sqlite3',
+    #     'ENGINE': os.environ.get('DB_ENGINE',
+    #                              default='django.db.backends.postgresql'),
+    #     'NAME': os.environ.get('DB_NAME',
+    #                           default=os.path.join(BASE_DIR, 'postgres')),
+    #     'USER': os.environ.get('POSTGRES_USER'),
+    #     'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+    #     'HOST': os.environ.get('DB_HOST'),
+    #     'PORT': os.environ.get('DB_PORT'),
     # }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
 }
 
 
@@ -181,4 +181,26 @@ DJOSER = {
         'user': ['rest_framework.permissions.IsAuthenticated'],
     },
     'HIDE_USERS': False,
+    # 'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    # 'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'DOMAIN': 'localhost:8000',
+    'SITE_NAME': 'Foodgram',
+
+    # 'EMAIL'
 }
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'foodgram@bk.ru'
+EMAIL_HOST_PASSWORD = '09jEUXGMXBDyjsUiVHnZ'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Новый рецепт{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+{% endblock %}
+
+{% block main %}
+    {% load website_filters %}
+    <div class="container">
+        <div class="row mt-5 mb-2 justify-content-center">
+            <h1 class="col-md-6 text-center">Новый рецепт</h1>
+        </div>
+        <div class="row">
+            <!-- ФОРМА ДОБАВЛЕНИЯ РЕЦЕПТА -->
+            <form class="col col-lg-8 offset-lg-2 border rounded my-5 p-5 shadow"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    {% if field %}
+                        <div class="form-group row">
+                            <div class="col-5">
+                                {{ field.label }}
+                            </div>
+                            <div class="col-7">
+                                {{ field|add_class:"form-control __options__ml-3 __options__mr-1" }}
+                                <small class="form-text">{{ field.help_text }}</small>
+                            </div>
+                            {% if field.errors %}
+                                <div class="col text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <!-- БЛОК СО СПИСКОМ ИНГРЕДИЕНТОВ -->
+                <h2>Список ингредиентов</h2>
+                {{ formset.management_form }}
+                <div id="ingredients-formset">
+                    {% for form in formset %}
+                        <div class="add-ingredient-container border my-2 p-2 border-light rounded"
+                             id="container-{{ form.ingredient.auto_id }}">
+                            <div class="form-group row my-2">
+                                <div class="col-5">
+                                    {{ form.ingredient.label }}
+                                </div>
+                                <div class="col-7">
+                                    <div class="form-control">
+                                        {{ form.ingredient|add_class:"dropdown-menu" }}
+                                    </div>
+                                </div>
+{#                                 ошибки генерируются сразу при создании fieldset? #}
+                                {% if request.method != "GET" and form.ingredient.errors %}
+                                    <div class="col text-danger">{{ form.ingredient.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group row my-2">
+                                <div class="col-5">
+                                    {{ form.amount.label }}
+                                </div>
+                                <div class="col-7">
+                                    {{ form.amount|add_class:"form-control" }}
+                                </div>
+{#                                 ошибки генерируются сразу при создании fieldset? #}
+                                {% if request.method != "GET" and form.amount.errors %}
+                                    <div class="col text-danger">{{ form.amount.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="my-2 text-right">
+                                {% if formset.can_delete %}
+                                    {{ form.DELETE }}
+                                {% endif %}
+                                <a href="#" class="btn btn-light remove-ingredient-button">
+                                    Удалить ингредиент</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- КНОПКА ДОБАВЛЕНИЯ ИНГРЕДИЕНТА -->
+                <div class="form-group row my-3">
+                    <a href="" class="btn block-lightstyle" id="add-ingredient-button">
+                        Добавить ингредиент</a>
+                </div>
+
+                <div class="form-group row mt-5 d-flex justify-content-center align-items-center">
+                    <button type="submit" class="btn block-darkstyle mx-3">
+                        Создать рецепт
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/ru.js"></script>
+    {% load static %}
+    <script src="{% static 'js/recipe-create.js' %}"></script>
+{% endblock %}

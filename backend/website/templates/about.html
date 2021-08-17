@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}О проекте{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row my-4">
+            <h1 class="col">О проекте</h1>
+        </div>
+        <div class="row my-4">
+            <h2 class="col">Об авторе</h2>
+        </div>
+        <div class="row my-4">
+            <p class="col">Привет! Меня зовут Константин, я начинающий разработчик и этот
+                проект я создал в рамках изучения фреймворака Django и Django
+                Rest Framework. Вы можете посмотреть мой профиль
+                <a href="https://github.com/captainKoala">на GitHub</a>.</p>
+        </div>
+        <div class="row my-4">
+            <h2 class="col">Сайт</h2>
+        </div>
+        <div class="row my-4">
+            <h2 class="col">API</h2>
+        </div>
+        <div class="row my-4">
+            <p class="col-12">Документация по API доступна по адресу </p>
+            <p class="col-12">API доступно по адресу <a href="/api">/api/</a></p>
+        </div>
+        <div class="row my-4">
+            <h2 class="col">Панель администратора</h2>
+        </div>
+        <div class="row my-4">
+            <p class="col-12">
+                Панель администратора реализована на базе стандартной админки
+                Django. Доступ к админке открыт только пользователям со
+                статусом "Персонал".
+            </p>
+            <p class="col-12">Пользователи из группы "Администраторы" могут
+                управлять (создавать, редактировать, удалять) всеми сущностями
+                - рецепты, теги, ингредиенты, пользователи и т.д.
+            </p>
+            <p class="col-12"></p>
+            <p class="col-12"></p>
+        </div>
+        <div class="row my-4">
+            <h2 class="col">Используемые технологии</h2>
+        </div>
+        <div class="row my-r">
+            <ul>
+                <li><b>Django 3.2</b>, а также
+                    <ul>
+                        <li><b>Djoser 2.1.0</b></li>
+                        <li><b>Django-wkhtmltopdf 3.3.0</b></li>
+                        <li><b></b></li>
+                        <li><b></b></li>
+                        <li><b>Django-filter 2.4.0</b></li>
+                        <li><b>Django-colorfield 0.4.2</b></li>
+                        <li><b></b></li>
+                    </ul>
+                </li>
+                <li><b>Django Rest Framework 3.12.4</b>, а также
+                    <ul>
+                        <li><b>DRF-extra-fields</b></li>
+                        <li><b></b></li>
+                        <li><b></b></li>
+                    </ul>
+                </li>
+                <li><b>Bootstrap 4.6.0</b></li>
+                <li></li>
+                <li><b>PostgreSQL</b></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

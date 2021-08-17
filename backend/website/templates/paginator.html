@@ -1,0 +1,12 @@
+{% if page.has_other_pages %}
+    <nav>
+        <ul class="pagination pagination-lg justify-content-center my-4"
+            data-num-pages="{{ page.paginator.num_pages }}"
+            data-current-page="{{ page.number }}">
+        </ul>
+    </nav>
+{% endif %}
+
+{% load static %}
+
+<script src="{% static 'js/pagination.js' %}"></script>

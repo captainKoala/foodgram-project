@@ -10,50 +10,56 @@
             </button>
             <div class="navbar-collapse collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
+                    <li class="nav-item m-auto text-center">
                         <a class="nav-link"
                            href="{% url 'web-recipes' %}">Рецепты</a>
                     </li>
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link"
-                               href="#">Мои подписки</a>
+                               href="{% url 'web-subscriptions' %}">
+                                Мои подписки</a>
+                        </li>
+                        <li class="nav-item m-auto text-center">
+                            <a class="nav-link"
+                               href="{% url 'web-recipe-create' %}">
+                               Создать рецепт</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link"
-                               href="#">Создать рецепт</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link m-auto text-center"
                                href="{% url 'web-favorite-recipes' %}">
                                 Избранное
-                                {% if favorite_recipes %}
-                                    ({{ favorite_recipes.count }})
-                                {% endif %}
+                                <span class="favorites-count badge badge-secondary py-1 px-2
+                                    {% if not favorite_recipes %}d-none{% endif %}">
+                                    {{ favorite_recipes.count }}
+                                </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link"
-                               href="#">Список покупок
-                                {% if shopping_cart %}
-                                    ({{ shopping_cart.count }})
-                                {% endif %}
+                               href="{% url 'web-shopping-cart' %}">Покупки
+                                <span class="shopping-cart-count badge badge-secondary py-1 px-2
+                                    {% if not shopping_cart %}d-none{% endif %}">
+                                        {{ shopping_cart.count }}
+                                </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link"
-                               href="#"><b>{{ request.user }}</b></a>
+                               href="{% url 'web-author-page' author_id=user.id %}">
+                                <b>{{ request.user }}</b>
+                            </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link"
                                href="{% url "web-logout" %}">Выход</a>
                         </li>
                     {% else %}
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link"
                                href="{% url "web-login" %}">Вход</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item m-auto text-center">
                             <a class="nav-link" href="{% url 'signup' %}">
                                 Создать аккаунт</a>
                         </li>

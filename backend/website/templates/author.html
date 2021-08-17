@@ -3,18 +3,26 @@
 {% block title %}{{ author.first_name }} {{ author.last_name }}{% endblock %}
 
 {% block main %}
-<div class="container text-dark">
+<div class="container">
     <div class="row mt-5 mb-2">
         <div class="col-md-6">
             <h1>{{ author.first_name }} {{ author.last_name }}</h1>
-            <div>
-                {% include "recipe-btn-follow-author.html" with authorid=author.id %}
-            </div>
+            {% if user.is_authenticated and user.id is not author.id %}
+                <div>
+                    {% include "recipe-btn-follow-author.html" with authorid=author.id %}
+                </div>
+            {% endif %}
         </div>
         {% include "tags-filter.html" %}
     </div>
     <div class="row mt-5 mb-2">
-        {% include "recipe-list.html" %}
+        <div class="col">
+            {% include "recipe-list.html" %}
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block paginator %}
+    {% include "paginator.html" with page=recipes %}
 {% endblock %}

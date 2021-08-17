@@ -31,5 +31,4 @@ urlpatterns = [
          SubscriptionsViewSet.as_view({'get': 'create',
                                        'delete': 'destroy'}),
          name='subscribe'),
-    path("select2/", include("django_select2.urls")),
 ]

@@ -1,29 +1,27 @@
 <!-- ФИЛЬТР ПО ТЕГАМ -->
-<ul class="tags-filter col-md-6 d-flex justify-content-center justify-content-md-end">
+<div class="tags-filter col-md-6 p-2 d-flex flex-wrap justify-content-center justify-content-md-end">
     {% for tag in tags %}
-        <li class="tags-filter-item p-2">
-            {% if tag.slug in selected_tags %}
-                <a href="#" style="color:{{ tag.color }};"
-                   class="d-flex align-items-center" data-slug="{{ tag.slug }}"
-                   data-isselected="true">
-                        {% include "icons/check-circle-fill.svg" %}
-                        <span class="ml-1">
-                            {{ tag.name }}
-                        </span>
-                </a>
-            {% else %}
-                <a href="#" style="color:{{ tag.color }};"
-                   class="d-flex align-items-center" data-slug="{{ tag.slug }}"
-                   data-isselected="false">
-                        {% include "icons/circle.svg" %}
-                        <span class="ml-1">
-                            {{ tag.name }}
-                        </span>
-                </a>
-            {% endif %}
-        </li>
+        {% if tag.slug in selected_tags %}
+            <a href="#" style="color:{{ tag.color }};"
+               class="tags-filter-item ml-2 d-flex align-items-center" data-slug="{{ tag.slug }}"
+               data-isselected="true">
+                    {% include "icons/check-circle-fill.svg" %}
+                    <span class="ml-1">
+                        {{ tag.name }}
+                    </span>
+            </a>
+        {% else %}
+            <a href="#" style="color:{{ tag.color }};"
+               class="tags-filter-item ml-2 d-flex align-items-center" data-slug="{{ tag.slug }}"
+               data-isselected="false">
+                    {% include "icons/circle.svg" %}
+                    <span class="ml-1">
+                        {{ tag.name }}
+                    </span>
+            </a>
+        {% endif %}
     {% endfor %}
-</ul>
+</div>
 
 {% load static %}
 <script src="{% static 'js/tags-filter.js' %}"></script>

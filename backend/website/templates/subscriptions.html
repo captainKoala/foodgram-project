@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Подписки{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row mt-5 mb-2">
+            <h1 class="col">Подписки</h1>
+        </div>
+        <div class="row">
+            {% for author in authors %}
+                <!-- КАРТОЧКА ПОЛЬЗОВАТЕЛЯ -->
+                <div class="card-wrapper col-12 col-md-6 col-lg-4 p-2">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="card-title">
+                                <a href="{% url 'web-author-page' author_id=author.id %}"
+                                   >
+                                    {{ author.first_name }} {{ author.last_name }}
+                                </a>
+                            </h2>
+                            <!-- СПИСОК РЕЦЕПТОВ -->
+                            {% for recipe in author.recipes|slice:3 %}
+                                <a href="{% url 'web-recipe-single' recipe_id=recipe.id %}"
+                                   >
+                                    <div class="subscription-recipe d-flex row mb-3">
+                                        <div class="col-9">
+                                            <div class="my-3">{{ recipe.name }}</div>
+                                            <div class="pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                                                {% include "icons/clock.svg" %}
+                                                20 мин.
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="rounded-bg-image"
+                                             style="background-image: url('{{ recipe.image }}')"
+                                                 title="{{ recipe.name }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            {% if author.recipes_count > 3 %}
+                                <a href="{% url 'web-author-page' author_id=author.id %}">Еще {{ author.recipes_count|add:-3 }} рецептов...</a>
+                            {% endif %}
+                            <div class="text-center mt-3">
+                                {% include "recipe-btn-follow-author.html" with is_followed=True authorid=author.id %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% load static %}
+    <script src="{% static 'js/buttons.js' %}"></script>
+{% endblock %}

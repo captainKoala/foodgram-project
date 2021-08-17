@@ -3,12 +3,13 @@ from django.contrib import admin
 from .models import User
 
 
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'first_name', 'last_name', 'email']
-    fields = ['username', 'last_name', 'first_name', 'email', 'password',
-              'groups']
-    list_filter = ['username', 'email']
-    search_fields = ['username', 'first_name', 'last_name']
+    list_display = ('id', 'username', 'first_name', 'last_name', 'email')
+    fields = ('username', 'last_name', 'first_name', 'email', 'password',
+              'is_staff', 'groups')
+    list_filter = ('username', 'email')
+    search_fields = ('username', 'first_name', 'last_name')
 
     def save_model(self, request, obj, form, change):
         """
@@ -23,4 +24,4 @@ class UserAdmin(admin.ModelAdmin):
         obj.save()
 
 
-admin.site.register(User, UserAdmin)
+

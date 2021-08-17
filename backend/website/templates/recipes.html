@@ -3,11 +3,15 @@
 {% block title %}Рецепты{% endblock %}
 
 {% block main %}
-<div class="container text-dark">
+<div class="container">
     <div class="row mt-5 mb-2">
         <h1 class="col-md-6">Рецепты</h1>
         {% include "tags-filter.html" %}
     </div>
     {% include "recipe-list.html" %}
 </div>
+{% endblock %}
+
+{% block paginator %}
+    {% include "paginator.html" with page=recipes %}
 {% endblock %}
