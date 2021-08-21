@@ -125,7 +125,7 @@ class RecipeIngredientsDetails(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name="Ингредиент",
-        help_text="Добавьте ингредиент",
+        help_text="Выберите ингредиент",
         on_delete=models.CASCADE,
     )
     amount = models.IntegerField(

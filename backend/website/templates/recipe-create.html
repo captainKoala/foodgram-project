@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}Новый рецепт{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
@@ -12,7 +12,7 @@
     {% load website_filters %}
     <div class="container">
         <div class="row mt-5 mb-2 justify-content-center">
-            <h1 class="col-md-6 text-center">Новый рецепт</h1>
+            <h1 class="col-md-6 text-center">{{ title }}</h1>
         </div>
         <div class="row">
             <!-- ФОРМА ДОБАВЛЕНИЯ РЕЦЕПТА -->
@@ -52,11 +52,13 @@
                                         {{ form.ingredient|add_class:"dropdown-menu" }}
                                     </div>
                                 </div>
-{#                                 ошибки генерируются сразу при создании fieldset? #}
-                                {% if request.method != "GET" and form.ingredient.errors %}
-                                    <div class="col text-danger">{{ form.ingredient.errors }}</div>
-                                {% endif %}
                             </div>
+                            <div class="col-7 offset-5">
+                                <small class="form-text">{{ form.ingredient.help_text }}</small>
+                            </div>
+                            {% if form.ingredient.errors %}
+                                <div class="col-7 offset-5 text-danger">{{ form.ingredient.errors }}</div>
+                            {% endif %}
                             <div class="form-group row my-2">
                                 <div class="col-5">
                                     {{ form.amount.label }}
@@ -64,15 +66,14 @@
                                 <div class="col-7">
                                     {{ form.amount|add_class:"form-control" }}
                                 </div>
-{#                                 ошибки генерируются сразу при создании fieldset? #}
-                                {% if request.method != "GET" and form.amount.errors %}
+                                <div class="col-7 offset-5">
+                                    <small class="form-text">{{ form.amount.help_text }}</small>
+                                </div>
+                                {% if form.amount.errors %}
                                     <div class="col text-danger">{{ form.amount.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="my-2 text-right">
-                                {% if formset.can_delete %}
-                                    {{ form.DELETE }}
-                                {% endif %}
                                 <a href="#" class="btn btn-light remove-ingredient-button">
                                     Удалить ингредиент</a>
                             </div>

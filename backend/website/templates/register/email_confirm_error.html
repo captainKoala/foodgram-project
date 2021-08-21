@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Ошибка подтверждения e-mail{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row mt-5 mb-2">
+            <h1 class="col">Не удалось подтвердить ваш e-mail</h1>
+        </div>
+        <div class="row my-5">
+            При попытке подтверждения e-mail возникла ошибка '{{ error }}'
+        </div>
+    </div>
+{% endblock %}

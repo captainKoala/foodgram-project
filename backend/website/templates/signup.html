@@ -10,13 +10,26 @@
                   method="post"
                   action="{% url 'signup' %}">
                 {% csrf_token %}
+                {% load website_filters %}
                 {% for field in form %}
-                <div class="form-group row">
-                    <label for="emailInput" class="col-4">{{ field.label }}</label>
-                    <div class="col-8">
-                        {{ field }}
+                    <div class="form-group row">
+                        <label for="emailInput" class="col-4">{{ field.label }}</label>
+                        <div class="col-8">
+                            {{ field|add_class:"form-control" }}
+                        </div>
+                        <div class="col-8 offset-4">
+                            <small class="form-text">{{ field.help_text }}</small>
+                        </div>
                     </div>
-                </div>
+                    {% if field.errors %}
+                        <div class="form-group row">
+                                <div class="col-8 offset-2 text-danger">
+                                    {% for error in field.errors %}
+                                        {{ error }} <br>
+                                    {% endfor %}
+                                </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
                 <div class="form-group row d-flex justify-content-center align-items-center">
                     <button type="submit" class="btn btn-primary mx-3">Зарегистрироваться</button>

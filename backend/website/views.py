@@ -1,23 +1,28 @@
+import requests
+
+from django.conf import settings
+from django.contrib.auth import views as auth_views
 from django.core.paginator import Paginator
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 
 from .forms import CustomUserCreationForm, IngredientsFormSet, RecipeCreateForm
-from api.models import Ingredient, Recipe, Tag
+from api.models import Ingredient, Recipe, RecipeIngredientsDetails, Tag
 from api.views import (RecipeFavouriteViewSet, ShoppingCartViewSet,
                        SubscriptionsViewSet)
 from users.models import User
 
 
 RECIPES_PER_PAGE = 6
+INGREDIENT_FORMSET_PREFIX = "ingredient"
 
 
 def index(request):
@@ -27,10 +32,80 @@ def index(request):
     return redirect(reverse_lazy("web-login"))
 
 
-class SignUp(CreateView):
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy("signup")
-    template_name = "signup.html"
+def signup(request):
+    """ Страница регистрации пользователя. """
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            url = settings.PROTOCOL + settings.DOMAIN + "/api/users/"
+            data = {"username": form.data["username"],
+                    "first_name": form.data["first_name"],
+                    "last_name": form.data["last_name"],
+                    "email": form.data["email"],
+                    "password": form.data["password1"]}
+            response = requests.post(url, data=data)
+            if response.status_code == 201:
+                return render(request,
+                              template_name="registration/signup_success.html")
+            else:
+                return render(request,
+                              template_name="registration/signup_error.html",
+                              context={"response": response.text})
+        return render(request, template_name="signup.html",
+                      context={"form": form})
+    form = CustomUserCreationForm()
+    return render(request, template_name="signup.html",
+                  context={"form": form})
+
+
+class ActivateUser(GenericAPIView):
+    """Активация пользователя по ссылке в e-mail."""
+    def get(self, request, uid, token):
+        payload = {'uid': uid, 'token': token}
+
+        url = settings.PROTOCOL + settings.DOMAIN + "/api/users/activation/"
+        response = requests.post(url, data=payload)
+
+        if response.status_code == 204:
+            return render(
+                request,
+                template_name="register/email_confirm_success.html")
+        try:
+            error = response.json().get("detail")
+        except:
+            error = "Неизвестная ошибка"
+        return render(request, context={"error": error},
+                      template_name="register/email_confirm_error.html")
+
+
+class CustomPasswordChangeView(auth_views.PasswordChangeView):
+    """Смена пароля."""
+    template_name = "register/password_change_form.html"
+
+
+class CustomPasswordChangeDoneView(auth_views.PasswordChangeDoneView):
+    """Смена пароля успешна"""
+    template_name = "register/password_change_done.html"
+
+
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    """Сброс пароля."""
+    template_name = "register/password_reset_form.html"
+
+
+class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    """Сброс пароля успешен."""
+    template_name = "register/password_reset_done.html"
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Форма ввода нового пароля после сброса."""
+    template_name = "register/password_reset_confirm.html"
+
+
+class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    """Успешный сброс пароля."""
+    template_name = "register/password_reset_complete.html"
 
 
 class WebsiteRecipeFavouriteViewSet(RecipeFavouriteViewSet):
@@ -124,38 +199,80 @@ def favorite_recipes(request):
     return render(request, context=context, template_name="recipes.html")
 
 
-def recipe_create(request):
-    """Создание нового рецепта."""
+def recipe_edit(request, recipe_id=None):
+    """Страница создания и редактирования рецепта."""
     if request.user.is_anonymous:
         return redirect(reverse_lazy("web-login"))
 
-    prefix = "ingredient"
+    if recipe_id:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        if (request.user != recipe.author and
+                not request.user.groups.filter(
+                    name="Администраторы").exists()):
+            return redirect(reverse_lazy("web-recipe-single",
+                                         kwargs={"recipe_id": recipe_id}))
+        title = "Изменение рецепта"
+        button_text = "Сохранить изменения"
+    else:
+        recipe = Recipe()
+        title = "Новый рецепт"
+        button_text = "Создать рецепт"
 
     if request.method == "POST":
-        from pprint import pprint
-        pprint(request.POST)
-        form = RecipeCreateForm(data=request.POST, files=request.FILES)
-        formset = IngredientsFormSet(data=request.POST, prefix=prefix)
+        data = request.POST.copy()
+        data[f"{INGREDIENT_FORMSET_PREFIX}-INITIAL_FORMS"] = 0
+
+        form = RecipeCreateForm(data=data,
+                                files=request.FILES,
+                                instance=recipe)
+        formset = IngredientsFormSet(data=data,
+                                     prefix=INGREDIENT_FORMSET_PREFIX,
+                                     instance=recipe)
         if form.is_valid() and formset.is_valid():
             recipe = form.save(commit=False)
             recipe.author_id = request.user.id
             recipe.save()
             form.save_m2m()
+            RecipeIngredientsDetails.objects.filter(recipe_id=recipe_id).delete()
             formset.instance = recipe
             formset.save()
-            return redirect(reverse_lazy("index"))
-        context = {"form": form, "formset": formset}
+            return redirect(reverse_lazy("web-recipe-single",
+                                         kwargs={"recipe_id": recipe.id}))
+        context = {"form": form, "formset": formset, "title": title,
+                   "button_text": button_text, }
         return render(request, template_name="recipe-create.html",
                       context=context)
 
-    form = RecipeCreateForm()
-    formset = IngredientsFormSet({f"{prefix}-INITIAL_FORMS": "0",
-                                  f"{prefix}-MAX_NUM_FORMS": "5",
-                                  f"{prefix}-MIN_NUM_FORMS": "1",
-                                  f"{prefix}-TOTAL_FORMS": "2", },
-                                 prefix=prefix,)
-    context = {"form": form, "formset": formset, }
+    form = RecipeCreateForm(instance=recipe)
+
+    formset = IngredientsFormSet(
+        instance=recipe,
+        prefix=INGREDIENT_FORMSET_PREFIX,
+    )
+
+    context = {
+        "form": form,
+        "formset": formset,
+        "title": title,
+        "button_text": button_text,
+    }
+
     return render(request, context=context, template_name="recipe-create.html")
+
+
+def recipe_remove(request, recipe_id):
+    """Удаление рецепта."""
+    if request.user.is_anonymous:
+        return redirect(reverse_lazy("web-login"))
+
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if (request.user != recipe.author and
+            not request.user.groups.filter(name="Администраторы").exists()):
+        return redirect(reverse_lazy("web-recipe-single",
+                                     kwargs={"recipe_id": recipe_id}))
+    recipe.delete()
+    return redirect(reverse_lazy("index"))
 
 
 def author_page(request, author_id):
@@ -195,10 +312,6 @@ class WebShoppingCartViewSet(ShoppingCartViewSet):
     authentication_classes = (SessionAuthentication, )
 
 
-class AboutPage(TemplateView):
-    template_name = "about.html"
-
-
 def ingredients_list(request):
     if request.is_ajax():
         term = request.GET.get("term")
@@ -206,3 +319,7 @@ def ingredients_list(request):
         response_content = list(heroes.values())
         return JsonResponse(response_content, safe=False)
     return redirect("index")
+
+
+class AboutPage(TemplateView):
+    template_name = "about.html"

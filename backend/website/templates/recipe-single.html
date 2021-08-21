@@ -27,8 +27,14 @@
             <div class="row mb-2">
                 {% if user.id == recipe.author.id or user.is_staff %}
                     <div class="col text-center">
-                        <a href="" class="btn block-lightstyle">Редактировать рецепт</a>
-                        <a href="" class="btn block-lightstyle">Удалить рецепт</a>
+                        <a href="{% url 'web-recipe-edit' recipe_id=recipe.id %}"
+                           class="btn block-lightstyle">
+                            {% include "icons/pencil.svg" %}
+                            Редактировать рецепт</a>
+                        <a href="#" class="btn block-lightstyle btn-remove-recipe"
+                           data-recipeid="{{ recipe.id }}">
+                            {% include "icons/trash.svg" %}
+                            Удалить рецепт</a>
                     </div>
                 {% endif %}
             </div>
@@ -74,7 +80,6 @@
 </div>
 
 {% load static %}
-<script src="{% static 'js/buttons.js' %}"></script>
-
+    <script src="{% static 'js/buttons.js' %}"></script>
 {% endblock %}
 
