@@ -3,85 +3,93 @@
 {% block title %}{{ recipe.name }}{% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="row mt-5">
-        <h1 class="col">{{ recipe.name }}</h1>
-    </div>
-    <div class="row mt-5 mb-2">
-        <div class="col-lg-5">
-            <div class="row mb-2">
-                <div class="col">
-                    <img src="{{ MEDIA_URL }}{{ recipe.image }}" alt="{{ recipe.name }}"
-                         class="img-fluid w-100 rounded">
-                </div>
-            </div>
-            {% if user.is_authenticated %}
-                <div class="row">
-                    <div class="col-12">
-                        <!-- добавить в покупки -->
-                        {% include "recipe-btn-add-to-shooping-cart.html" %}
+    <div class="container">
+        <div class="row mt-5">
+            <h1 class="col">{{ recipe.name }}</h1>
+        </div>
+        <div class="row mt-5 mb-2">
+            <div class="col-lg-5">
+                <div class="row mb-2">
+                    <div class="col">
+                        <img src="{{ MEDIA_URL }}{{ recipe.image }}" alt="{{ recipe.name }}"
+                             class="img-fluid w-100 rounded">
                     </div>
-                    {% if user.id == recipe.author.id or user.is_staff %}
+                </div>
+                {% if user.is_authenticated %}
+                    <div class="row">
                         <div class="col-12">
-                            <a href="{% url 'web-recipe-edit' recipe_id=recipe.id %}"
-                               class="btn block-lightstyle d-block my-2">
-                                {% include "icons/pencil.svg" %}
-                                Редактировать рецепт</a>
+                            <!-- добавить в покупки -->
+                            {% include "recipe-btn-add-to-shooping-cart.html" %}
                         </div>
-                        <div class="col-12">
-                            <a href="#" class="btn block-lightstyle btn-remove-recipe d-block my-2"
-                               data-recipeid="{{ recipe.id }}">
-                                {% include "icons/trash.svg" %}
-                                Удалить рецепт</a>
+                        {% if user.id == recipe.author.id or user.is_staff %}
+                            <div class="col-12">
+                                <a href="{% url 'web-recipe-edit' recipe_id=recipe.id %}"
+                                   class="btn block-lightstyle d-block my-2">
+                                    {% include "icons/pencil.svg" %}
+                                    Редактировать рецепт</a>
+                            </div>
+                            <div class="col-12">
+                                <!-- кнопка удаления рецепта -->
+                                <a class="btn block-lightstyle d-block my-2"
+                                   data-toggle="modal" data-target="#modalRemoveRecipe">
+                                    {% include "icons/trash.svg" %}
+                                    Удалить рецепт</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-7">
+                <div class="row">
+                    <div class="col-10">
+                        <!-- список тегов -->
+                        {% include "recipe-tags-list.html" %}
+                    </div>
+                    {% if request.user.is_authenticated %}
+                        <div class="col-2">
+                            <!-- кнопка избранного -->
+                            {% include "recipe-btn-add-to-favorites.html" %}
                         </div>
                     {% endif %}
                 </div>
-            {% endif %}
-        </div>
-        <div class="col-lg-7">
-            <div class="row">
-                <div class="col-10">
-                    <!-- список тегов -->
-                    {% include "recipe-tags-list.html" %}
+                <!-- время приготовления -->
+                <div class="mt-4">
+                    {% include "recipe-cooking-time.html" %}
                 </div>
-                {% if request.user.is_authenticated %}
-                    <div class="col-2">
-                        <!-- кнопка избранного -->
-                        {% include "recipe-btn-add-to-favorites.html" %}
-                    </div>
-                {% endif %}
-            </div>
-            <!-- время приготовления -->
-            <div class="mt-4">
-                {% include "recipe-cooking-time.html" %}
-            </div>
-            <!-- автор -->
-            <div class="row">
-                <div class="col-12 col-md-6 mt-4">
-                    {% include "recipe-author.html" %}
-                </div>
-                <!-- кнопка подписки -->
-                {% if user.is_authenticated %}
+                <!-- автор -->
+                <div class="row">
                     <div class="col-12 col-md-6 mt-4">
-                        {% include "recipe-btn-follow-author.html" with authorid=recipe.author.id%}
+                        {% include "recipe-author.html" %}
                     </div>
-                {% endif %}
+                    <!-- кнопка подписки -->
+                    {% if user.is_authenticated %}
+                        <div class="col-12 col-md-6 mt-4">
+                            {% include "recipe-btn-follow-author.html" with authorid=recipe.author.id%}
+                        </div>
+                    {% endif %}
+                </div>
+                <h2 class="mt-4">Ингредиенты</h2>
+                <table class="table table-striped mt-4">
+                    {% for ingredient in recipe.ingredient_details.all %}
+                        <tr>
+                            <td>{{ ingredient.ingredient.name|capfirst }}</td>
+                            <td class="text-center">{{ ingredient.amount }}</td>
+                            <td class="text-center">{{ ingredient.ingredient.measurement_unit }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <h2 class="mt-4">Описание</h2>
+                <p>{{ recipe.text|linebreaks }}</p>
             </div>
-            <h2 class="mt-4">Ингредиенты</h2>
-            <table class="table table-striped mt-4">
-                {% for ingredient in recipe.ingredient_details.all %}
-                    <tr>
-                        <td>{{ ingredient.ingredient.name|capfirst }}</td>
-                        <td class="text-center">{{ ingredient.amount }}</td>
-                        <td class="text-center">{{ ingredient.ingredient.measurement_unit }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-            <h2 class="mt-4">Описание</h2>
-            <p>{{ recipe.text|linebreaks }}</p>
         </div>
     </div>
-</div>
+
+    <!-- модальное окно подтверждения удаления рецепта -->
+    {% with modal_id="modalRemoveRecipe" modal_title="Удалить рецепт" modal_text="Вы действительно хотите удалить рецепт?" %}
+        {% with modal_btn_ok="Удалить" modal_btn_cancel="Отмена" modal_btn_ok_url="web-recipe-remove" modal_btn_ok_url_params=recipe.id %}
+            {% include "modals/confirm.html" %}
+        {% endwith %}
+    {% endwith %}
 
 {% load static %}
     <script src="{% static 'js/buttons.js' %}"></script>
