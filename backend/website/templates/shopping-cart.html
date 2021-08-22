@@ -7,6 +7,16 @@
         <div class="row mt-5 mb-2">
             <h1 class="col">Список покупок</h1>
         </div>
+        <div class="row my-4">
+            <p class="col">
+                Здесь Вы можете получить список необходимых ингредиентов для
+                приготовления выбранных рецептов и их суммарное количество для
+                всех выбранных рецептов.
+            </p>
+        </div>
+        <div class="row">
+            <h2 class="col my-4">Добавленные в список рецепты</h2>
+        </div>
         {% for recipe in recipes %}
             <div class="row mb-3 {% if not forloop.last %}border-bottom{% endif %}
                         shopping-cart-row">
@@ -19,7 +29,7 @@
                         </div>
                     </div>
                     <div class="col-8">
-                        <div class="my-3">{{ recipe.name }}</div>
+                        <div class="my-3"><b>{{ recipe.name }}</b></div>
                         <div class="pb-4">
                             {% include "icons/clock.svg" %}
                             20 мин.
@@ -27,21 +37,49 @@
                     </div>
                 </a>
                 <div class="col-2 m-auto">
-                    <a href="#"
+                    <a href="{% url 'web-remove-from-shopping-cart' recipe_id=recipe.id %}"
                        class="shopping-cart-delete"
                        data-recipeid="{{ recipe.id }}">
                         Удалить</a>
                 </div>
             </div>
+        {% empty %}
+            В список покупок не было добавлено ни одного рецепта.
         {% endfor %}
-        <div class="row my-4">
-            <div class="col text-center">
-                <a href="{% url 'web-shopping-cart-download' %}"
-                   class="btn btn-primary">
-                    Скачать в формате PDF
-                </a>
-            </div>
+
+        {% if purchases %}
+        <div class="row">
+            <h2 class="col my-4">Список ингредиентов для покупки</h2>
         </div>
+            <div class="row">
+                <div class="col">
+                    <table class="table table-striped mt-4">
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Ингредиент</th>
+                            <th class="text-center">Кол-во</th>
+                        </tr>
+                        {% for name, amount in purchases.items %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="text-center">{{ name }}</td>
+                                <td class="text-center">{{ amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        {% if recipes %}
+            <div class="row my-4">
+                <div class="col text-center">
+                    <a href="{% url 'web-shopping-cart-download' %}"
+                       class="btn btn-primary">
+                        Скачать в формате PDF
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 

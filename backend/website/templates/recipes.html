@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Рецепты{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block main %}
 <div class="container">
     <div class="row mt-5 mb-2">
-        <h1 class="col-md-6">Рецепты</h1>
+        <h1 class="col-md-6">{{ title }}</h1>
         {% include "tags-filter.html" %}
     </div>
     {% include "recipe-list.html" %}

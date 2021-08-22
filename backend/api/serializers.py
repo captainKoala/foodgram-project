@@ -22,17 +22,7 @@ class IngredientSerializer(ModelSerializer):
         return ingredient
 
 
-class RecipeIngredientsDetailsReadSerializer(ModelSerializer):
-    id = ReadOnlyField(source="ingredient.id")
-    name = ReadOnlyField(source="ingredient.name")
-    measurement_unit = ReadOnlyField(source="ingredient.measurement_unit")
-
-    class Meta:
-        model = RecipeIngredientsDetails
-        fields = ["id", "name", "amount", "measurement_unit"]
-
-
-class RecipeIngredientsDetailsCreateSerializer(ModelSerializer):
+class RecipeIngredientsDetailsSerializer(ModelSerializer):
     id = IngredientSerializer()
 
     class Meta:
@@ -56,8 +46,7 @@ class TagSerializer(ModelSerializer):
 
 
 class RecipeReadSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsDetailsReadSerializer(
-        source="recipeingredientsdetails_set", many=True)
+    ingredients = SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
     author = AuthorSerializer()
     image = Base64ImageField(max_length=None, use_url=True)
@@ -83,9 +72,22 @@ class RecipeReadSerializer(ModelSerializer):
         return RecipeShoppingCart.objects.filter(user=user,
                                                  recipe=obj).exists()
 
+    def get_ingredients(self, obj):
+        ingredients = RecipeIngredientsDetails.objects.filter(recipe=obj)
+        data = []
+        for item in ingredients:
+            data.append({
+                "id": item.ingredient.id,
+                "name": item.ingredient.name,
+                "measurement_unit": item.ingredient.measurement_unit,
+                "amount": item.amount,
+            })
+        return data
+
 
 class RecipeCreateSerializer(ModelSerializer):
-    ingredients = RecipeIngredientsDetailsCreateSerializer(many=True)
+    ingredients = RecipeIngredientsDetailsSerializer(many=True)
+
     image = Base64ImageField(max_length=None, use_url=True)
     author = PrimaryKeyRelatedField(read_only=True)
 
@@ -117,8 +119,8 @@ class RecipeCreateSerializer(ModelSerializer):
         ingredients_ids = [ingredient["id"] for ingredient in ingredients]
         if len(ingredients) != len(set(ingredients_ids)):
             raise ValidationError(
-                {"detail": "В рецепт нельзя добавлять одни и те ингредиенты "
-                           "несколько раз."})
+                {"detail": "В рецепт нельзя добавлять одни и те же ингредиенты"
+                           " несколько раз."})
         return data
 
     def create(self, validated_data):

@@ -1,10 +1,10 @@
 <!-- кнопка подписки на автора -->
 <!-- для использования необходимо подключить buttons.js -->
-<div>
+<div class="my-2">
     <a href="#"
        title="Добавить в список покупок"
        class="btn block-darkstyle btn-follow-author
-            {% if is_followed %}d-none{% endif %}"
+            {% if is_followed %}d-none{% else %}d-block{% endif %}"
             data-authorid="{{ authorid }}"
             data-is_selected="false">
         {% include "icons/person-plus.svg" %}
@@ -12,7 +12,7 @@
     <a href="#"
        title="Удалить из списка покупок"
        class="btn block-lightstyle btn-follow-author
-                {% if not is_followed %}d-none{% endif %}"
+                {% if not is_followed %}d-none{% else %}d-block{% endif %}"
             data-authorid="{{ authorid }}"
             data-is_selected="true">
         {% include "icons/person-x.svg" %}

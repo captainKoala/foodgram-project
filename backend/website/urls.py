@@ -60,6 +60,9 @@ urlpatterns = [
          name="web-subscriptions"),
 
     path("shopping_cart/", views.shopping_cart, name="web-shopping-cart"),
+    path("shopping_cart/remove/<int:recipe_id>/",
+         views.shopping_cart_remove,
+         name="web-remove-from-shopping-cart"),
 
     path("ingredients/", views.ingredients_list, name="web-ingredients"),
 

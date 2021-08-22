@@ -17,14 +17,16 @@
 
     {% block styles %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {% include "header.html" %}
 
-    {% block main %}{% endblock %}
+        {% block main %}{% endblock %}
 
-    {% block paginator %}{% endblock %}
+    <div class="mt-auto">
+        {% block paginator %}{% endblock %}
+        {% include "footer.html" %}
+    </div>
 
-    {% include "footer.html" %}
 
     <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
     {{ form.media }}

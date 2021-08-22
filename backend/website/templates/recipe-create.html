@@ -16,17 +16,17 @@
         </div>
         <div class="row">
             <!-- ФОРМА ДОБАВЛЕНИЯ РЕЦЕПТА -->
-            <form class="col col-lg-8 offset-lg-2 border rounded my-5 p-5 shadow"
+            <form class="col-12 col-lg-8 offset-lg-2 border rounded my-5 p-5 shadow"
                   method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 {% for field in form %}
                     {% if field %}
                         <div class="form-group row">
-                            <div class="col-5">
+                            <div class="col-12 col-sm-5">
                                 {{ field.label }}
                             </div>
-                            <div class="col-7">
+                            <div class="col-12 col-sm-7">
                                 {{ field|add_class:"form-control __options__ml-3 __options__mr-1" }}
                                 <small class="form-text">{{ field.help_text }}</small>
                             </div>
@@ -44,52 +44,58 @@
                         <div class="add-ingredient-container border my-2 p-2 border-light rounded"
                              id="container-{{ form.ingredient.auto_id }}">
                             <div class="form-group row my-2">
-                                <div class="col-5">
+                                <div class="col-12 col-sm-5">
                                     {{ form.ingredient.label }}
                                 </div>
-                                <div class="col-7">
-                                    <div class="form-control">
+                                <div class="col-12 col-sm-7">
+                                    <div class="form-control select2-custom-container">
                                         {{ form.ingredient|add_class:"dropdown-menu" }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-7 offset-5">
+                            <div class="col-12 col-sm-7 offset-sm-5">
                                 <small class="form-text">{{ form.ingredient.help_text }}</small>
                             </div>
                             {% if form.ingredient.errors %}
-                                <div class="col-7 offset-5 text-danger">{{ form.ingredient.errors }}</div>
+                                <div class="col-12 col-sm-7 offset-sm-5 text-danger">{{ form.ingredient.errors }}</div>
                             {% endif %}
                             <div class="form-group row my-2">
-                                <div class="col-5">
+                                <div class="col-12 col-sm-5">
                                     {{ form.amount.label }}
                                 </div>
-                                <div class="col-7">
+                                <div class="col-12 col-sm-7">
                                     {{ form.amount|add_class:"form-control" }}
                                 </div>
-                                <div class="col-7 offset-5">
+                                <div class="col col-sm-7 offset-sm-5">
                                     <small class="form-text">{{ form.amount.help_text }}</small>
                                 </div>
                                 {% if form.amount.errors %}
                                     <div class="col text-danger">{{ form.amount.errors }}</div>
                                 {% endif %}
                             </div>
-                            <div class="my-2 text-right">
-                                <a href="#" class="btn btn-light remove-ingredient-button">
-                                    Удалить ингредиент</a>
+                            <div class="row my-2 text-right">
+                                <div class="col col-sm-7 offset-sm-5">
+                                    <a href="#" class="btn btn-light remove-ingredient-button d-block">
+                                        Удалить ингредиент</a>
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
                 <!-- КНОПКА ДОБАВЛЕНИЯ ИНГРЕДИЕНТА -->
                 <div class="form-group row my-3">
-                    <a href="" class="btn block-lightstyle" id="add-ingredient-button">
+                    <div class="col col-sm-5">
+                        <a href="" class="btn block-lightstyle d-block" id="add-ingredient-button">
                         Добавить ингредиент</a>
+                    </div>
                 </div>
 
                 <div class="form-group row mt-5 d-flex justify-content-center align-items-center">
-                    <button type="submit" class="btn block-darkstyle mx-3">
-                        Создать рецепт
-                    </button>
+                    <div class="col col-sm-5">
+                        <button type="submit" class="btn block-darkstyle mx-3 d-block">
+                            Создать рецепт
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

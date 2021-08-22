@@ -2,6 +2,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -34,6 +35,8 @@ def index(request):
 
 def signup(request):
     """ Страница регистрации пользователя. """
+    if request.user.is_authenticated:
+        return redirect(reverse_lazy("index"))
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -183,9 +186,11 @@ def recipes_list(request):
     paginator = Paginator(recipes, RECIPES_PER_PAGE)
     page_number = request.GET.get("page")
     context["recipes"] = paginator.get_page(page_number)
+    context["title"] = "Рецепты"
     return render(request, context=context, template_name="recipes.html")
 
 
+@login_required(login_url=reverse_lazy("web-login"))
 def favorite_recipes(request):
     """Страница с избранными рецептами."""
     context = create_context(request)
@@ -196,14 +201,13 @@ def favorite_recipes(request):
                .distinct().order_by("-pub_date"))
 
     context["recipes"] = recipes
+    context["title"] = "Избранное"
     return render(request, context=context, template_name="recipes.html")
 
 
+@login_required(login_url=reverse_lazy("web-login"))
 def recipe_edit(request, recipe_id=None):
     """Страница создания и редактирования рецепта."""
-    if request.user.is_anonymous:
-        return redirect(reverse_lazy("web-login"))
-
     if recipe_id:
         recipe = get_object_or_404(Recipe, id=recipe_id)
         if (request.user != recipe.author and
@@ -260,11 +264,9 @@ def recipe_edit(request, recipe_id=None):
     return render(request, context=context, template_name="recipe-create.html")
 
 
+@login_required(login_url=reverse_lazy("web-login"))
 def recipe_remove(request, recipe_id):
     """Удаление рецепта."""
-    if request.user.is_anonymous:
-        return redirect(reverse_lazy("web-login"))
-
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
     if (request.user != recipe.author and
@@ -298,27 +300,40 @@ def author_page(request, author_id):
     return render(request, context=context, template_name="author.html")
 
 
+@login_required(login_url=reverse_lazy("web-login"))
 def shopping_cart(request):
     """Страница рецептов, добавленных в список покупок."""
     recipes = Recipe.objects.filter(to_shopping__user=request.user)
     context = create_context(request)
+    cart = ShoppingCartViewSet()
+    context["purchases"] = cart.get_purchases(request)
     context["recipes"] = recipes
     return render(request, context=context, template_name="shopping-cart.html")
 
 
-from api.views import ShoppingCartViewSet
+@login_required(login_url=reverse_lazy("web-login"))
+def shopping_cart_remove(request, recipe_id):
+    """Удаление рецепта из списка покупок и обновление списка ингредиентов."""
+    from api.models import RecipeShoppingCart
+
+    cart_recipe = get_object_or_404(RecipeShoppingCart, recipe_id=recipe_id, user=request.user)
+    cart_recipe.delete()
+    return redirect(reverse_lazy("web-shopping-cart"))
+
 
 class WebShoppingCartViewSet(ShoppingCartViewSet):
+    """Добавление и удаление рецепта из списка покупок."""
     authentication_classes = (SessionAuthentication, )
 
 
 def ingredients_list(request):
+    """Список всех ингредиентов."""
     if request.is_ajax():
         term = request.GET.get("term")
-        heroes = Ingredient.objects.filter(name__icontains=term)
-        response_content = list(heroes.values())
+        ingredients = Ingredient.objects.filter(name__icontains=term)
+        response_content = list(ingredients.values())
         return JsonResponse(response_content, safe=False)
-    return redirect("index")
+    return JsonResponse([], safe=False)
 
 
 class AboutPage(TemplateView):

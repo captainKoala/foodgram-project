@@ -1,9 +1,7 @@
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
 from django_filters import rest_framework as filters
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin, RetrieveModelMixin)
@@ -24,8 +22,6 @@ from .models import (Ingredient, Recipe, RecipeFavourite,
 from .permissions import IsAuthorOrIsStaffOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer,
-                          RecipeIngredientsDetailsCreateSerializer,
-                          RecipeIngredientsDetailsReadSerializer,
                           RecipeFavouriteSerializer, RecipeReadSerializer,
                           ShoppingCartSerializer, TagSerializer,
                           UserFollowSerializer)
@@ -36,20 +32,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (SearchFilter, )
-    search_fields = ("name", )
-
-
-class RecipeIngredientDetailsViewSet(ModelViewSet):
-    """Управление списком ингредиентов для рецепта (ингредиент и его
-    количество в рецепте).
-    """
-    queryset = RecipeIngredientsDetails.objects.all()
-
-    def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
-            return RecipeIngredientsDetailsReadSerializer
-        return RecipeIngredientsDetailsCreateSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ("name",)
 
 
 class RecipeViewSet(ModelViewSet):
@@ -58,7 +42,7 @@ class RecipeViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticatedOrReadOnly,
                           IsAuthorOrIsStaffOrReadOnly)
-    filter_backends = (filters.DjangoFilterBackend, )
+    filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
@@ -83,7 +67,7 @@ class RecipeUserRelationsViewSet(GenericViewSet, CreateModelMixin,
     и переопределить класс Meta (model, fields).
     """
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -123,12 +107,13 @@ class ShoppingCartViewSet(RecipeUserRelationsViewSet,
     class Meta:
         model = RecipeShoppingCart
 
-    def list(self, request, *args, **kwargs):
+    def get_purchases(self, request):
         """
-        Возвращает список ингредиентов, которые необходимо купить, в виде
-        pdf-файла. Список ингредиентов формируется из ингредиентов, имеющихся
+        Возвращает список покупок.
+        Список ингредиентов формируется из ингредиентов, имеющихся
         во всех добавленных в список покупок рецептов, без повторения
-        одинаковых ингредиентов."""
+        одинаковых ингредиентов.
+        """
         shopping_cart = RecipeShoppingCart.objects.filter(user=request.user)
         purchases = {}
         for cart in shopping_cart:
@@ -142,21 +127,28 @@ class ShoppingCartViewSet(RecipeUserRelationsViewSet,
                     purchases[name] += amount
                 else:
                     purchases[name] = amount
+        return purchases
+
+    def list(self, request, *args, **kwargs):
+        """
+        Возвращает список ингредиентов, которые необходимо купить, в виде
+        pdf-файла. """
 
         template = get_template("shopping_cart.html")
-        return PDFTemplateResponse(request=request,
-                                   template=template,
-                                   filename="shopping_cart.pdf",
-                                   context={"purchases": purchases},
-                                   show_content_in_browser=False,
-                                   cmd_options={'margin-top': 50, },
-                                   )
+        return PDFTemplateResponse(
+            request=request,
+            template=template,
+            filename="shopping_cart.pdf",
+            context={"purchases": self.get_purchases(request)},
+            show_content_in_browser=False,
+            cmd_options={'margin-top': 50, },
+        )
 
 
 class SubscriptionsViewSet(ModelViewSet):
     """Управление подпиской на пользователя."""
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):

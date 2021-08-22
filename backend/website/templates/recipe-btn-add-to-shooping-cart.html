@@ -1,18 +1,18 @@
 <!-- кнопка добаления в список покупок -->
 <!-- для использования необходимо подключить buttons.js -->
-<div>
+<div class="my-2">
     <a href="#"
        title="Добавить в список покупок"
        class="btn block-darkstyle btn-shopping-cart
-            {% if recipe in shopping_cart %}d-none{% endif %}"
+            {% if recipe in shopping_cart %}d-none{% else %}d-block{% endif %}"
             data-recipeid="{{ recipe.id }}"
             data-is_selected="false">
         {% include "icons/plus-lg.svg" %}
-        <span class="ml-2">Добавить в покупки</span></a>
+        <span class="ml-2">В покупки</span></a>
     <a href="#"
        title="Удалить из списка покупок"
        class="btn block-lightstyle btn-shopping-cart
-                {% if recipe not in shopping_cart %}d-none{% endif %}"
+                {% if recipe not in shopping_cart %}d-none{% else %}d-block{% endif %}"
             data-recipeid="{{ recipe.id }}"
             data-is_selected="true">
         {% include "icons/check-lg.svg" %}
