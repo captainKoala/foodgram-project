@@ -197,10 +197,13 @@ def favorite_recipes(request):
 
     recipes = (Recipe.objects.none()
                if "__none__" in context["selected_tags"] else
-               context["favorite_recipes"].filter(tags__slug__in=context["selected_tags"])
+               context["favorite_recipes"]
+               .filter(tags__slug__in=context["selected_tags"])
                .distinct().order_by("-pub_date"))
 
-    context["recipes"] = recipes
+    paginator = Paginator(recipes, RECIPES_PER_PAGE)
+    page_number = request.GET.get("page")
+    context["recipes"] = paginator.get_page(page_number)
     context["title"] = "Избранное"
     return render(request, context=context, template_name="recipes.html")
 
