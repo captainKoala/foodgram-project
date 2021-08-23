@@ -44,14 +44,24 @@ def signup(request):
                     "last_name": form.data["last_name"],
                     "email": form.data["email"],
                     "password": form.data["password1"]}
-            response = requests.post(url, data=data)
-            if response.status_code == 201:
-                return render(request,
-                              template_name="registration/signup_success.html")
-            else:
-                return render(request,
-                              template_name="registration/signup_error.html",
-                              context={"response": response.text})
+            error = None
+            try:
+                response = requests.post(url, data=data)
+            except requests.exceptions.ConnectionError as e:
+                error = e
+            except:
+                error = "Неизвестная ошибка"
+
+            if not error:
+                if response.status_code == 201:
+                    return render(
+                        request,
+                        template_name="registration/signup_success.html")
+                else:
+                    error = response.text
+            return render(request,
+                          template_name="registration/signup_error.html",
+                          context={"response": error})
         return render(request, template_name="signup.html",
                       context={"form": form})
     form = CustomUserCreationForm()
