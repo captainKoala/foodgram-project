@@ -30,6 +30,10 @@ h3 {
     color: orange;
 }
 
+.in-favorite:hover {
+    color: darkorange;
+}
+
 .in-favorite svg {
     width: 25px;
     height: 25px;
@@ -68,20 +72,19 @@ a:hover {
     color: #102027;
 }
 
-
 .card {
     border-radius: 10px;
     overflow: hidden;
 }
 
 .block-darkstyle {
-    background-color: #37474f;
+    background-color: #62727b;
     color: #e2f1f8;
 }
 
 .block-darkstyle:hover {
-    background-color: #62727b;
-    color: #e2f1f8;
+    background-color: #37474f;
+    color: #ced4da;
 }
 
 .block-lightstyle {

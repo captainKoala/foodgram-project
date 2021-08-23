@@ -35,11 +35,13 @@ docker-compose exec web python manage.py loaddata dump.json
 
 Административная панель доступна по адресу: http://localhost/admin/.
 
-## Пример
-Сайт доступен по адресу http://foodgram.koalavisit.ru.
-
 ## Используемые технологии для построения API
 
 * Django
 * Django Rest Framework
 * Djoser
+
+## Дополнение
+Фронтенд для задания был предоставлен готовый, поэтому позднее, когда API был
+готов, было дополнительно написано приложения website - сайт с использованием
+средств Django. Он и доступен по адресу http://foodgram.koalavisit.ru.
