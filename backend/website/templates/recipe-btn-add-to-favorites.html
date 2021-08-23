@@ -1,9 +1,11 @@
 <!-- кнопка добаления в избранное -->
 <!-- для использования необходимо подключить buttons.js -->
 <div class="my-2">
+{#    {{ recipe }}#}
+{#    {{ favorite_recipes }}#}
     <a href="#"
        title="Удалить из избранного"
-       class="in-favorite {% if recipe not in favorite_recipes %}d-none{% endif %}"
+       class="in-favorite {% if recipe not in favorite_recipes %}d-none{% else %}d-block{% endif %}"
        id="remove-from-favorite-{{ recipe.id }}"
        data-recipeid="{{ recipe.id }}"
        data-is_selected="true">
@@ -11,7 +13,7 @@
     </a>
     <a href="#"
        title="Добавить в избранное"
-       class="in-favorite {% if recipe in favorite_recipes %}d-none{% endif %}"
+       class="in-favorite {% if recipe in favorite_recipes %}d-none{% else %}d-block{% endif %}"
        id="add-to-favorite-{{ recipe.id }}"
        data-recipeid="{{ recipe.id }}"
        data-is_selected="false">

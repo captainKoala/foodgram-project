@@ -14,7 +14,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-const makeFetch = async (request, options)  => {6
+const makeFetch = async (request, options)  => {
     return fetch(request, options)
         .then(async response => {
             if (response.status === 201)
