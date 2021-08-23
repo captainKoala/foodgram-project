@@ -18,7 +18,7 @@ h2 {
 }
 
 h3 {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
 }
 
@@ -113,6 +113,23 @@ a:hover {
     border-radius: .25rem;
 }
 
+.page-item a {
+    color: #102027;
+}
+
+.page-item.active .page-link {
+    background-color: #62727b;
+    border-color: #62727b;
+}
+
+.page-item:hover:not(.disabled):not(.active) .page-link {
+    background-color: #e2f1f8;
+}
+
+.page-item.disabled a {
+    color: #62727b;
+}
+
 @media (max-width: 767px) {
     form.shadow {
         -webkit-box-shadow: none !important;
@@ -121,3 +138,4 @@ a:hover {
         border: none !important;
     }
 }
+
