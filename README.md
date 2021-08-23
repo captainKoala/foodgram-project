@@ -38,8 +38,6 @@ docker-compose exec web python manage.py loaddata dump.json
 ## Пример
 Сайт доступен по адресу http://foodgram.koalavisit.ru.
 
-Панель администратора доступна по логину `admin` и паролю `password1234example`. 
-
 ## Используемые технологии для построения API
 
 * Django
