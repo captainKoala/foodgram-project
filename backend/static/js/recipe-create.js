@@ -1,4 +1,9 @@
 const INGREDIENT_FIELDS_PREFIX = "ingredient";
+const INGREDIENT_LABEL = "Ингредиент";
+const INGREDIENT_HELP_TEXT = "Выберите ингредиент";
+const AMOUNT_LABEL = "Количество";
+const AMOUNT_HELP_TEXT = "Введите количество";
+const INGREDIENT_BTN_TEXT = "Удалить ингредиент";
 
 
 const addClasses = (element, classesString) => {
@@ -7,6 +12,25 @@ const addClasses = (element, classesString) => {
      * */
     for (let cl of classesString.split(" "))
         element.classList.add(cl);
+}
+
+const createHtmlElement = (tag, textContent="", options={}) => {
+    /** Создание HTML-элемента по тегу tag, с добавлением текстового содержимого
+     * textContent.
+     * options - объект, содержащий id - идентификатор, classes - строка с
+     * CSS-классами, разделенными пробелами, attributes - массив атрибутов,
+     * состоящий из массивов размером по 2 элемента (атрибут - значение).
+     */
+    let element = document.createElement(tag);
+    element.textContent = textContent;
+    if (options["id"])
+        element.id = options["id"];
+    if (options["classes"])
+        addClasses(element, options["classes"]);
+    if (options["attributes"])
+        for (let attribute of options["attributes"])
+            element.setAttribute(attribute[0], attribute[1]);
+    return element;
 }
 
 const createWrap = (to_wrap, wrapClasses) => {
@@ -27,55 +51,6 @@ const createWrap = (to_wrap, wrapClasses) => {
     return wrap;
 }
 
-const createSelect = (selectClasses, selectId, selectName) => {
-    /** Создает элемент select с классами selectClasses,
-     * идентификатором selectId, и атрибутом name - selectName.
-     * Классы передаются в виде строки, разделить - пробел.
-     * **/
-    let select = document.createElement("select");
-    addClasses(select, selectClasses);
-
-    select.id = selectId;
-    select.setAttribute("name", selectName);
-    let option = document.createElement("option");
-    option.textContent = "---------";
-    select.appendChild(option);
-
-    return select;
-}
-
-const createInput = (inputType, inputClasses, inputName, inputId) => {
-    /** Создает input с типом inputType, классами inputClasses,
-     * атрибутом name - inputName и идентификатором inputId.
-     * Классы передаются в виде строки, разделить - пробел.
-     * */
-    let input = document.createElement("input");
-    addClasses(input, inputClasses);
-    input.id = inputId;
-    input.setAttribute("name", inputName);
-
-    return input;
-}
-
-const createLabelDiv = (text, classes) => {
-    let labelWrap = document.createElement("div");
-    addClasses(labelWrap, classes);
-    labelWrap.textContent = text;
-    return labelWrap;
-}
-
-const createSelectDiv = (classes, innerWrapClasses, selectClasses,
-                         selectName, selectId) => {
-    let select = createSelect(selectClasses, selectId, selectName);
-    let innerWrap = createWrap(select, innerWrapClasses);
-    return createWrap(innerWrap, classes);
-}
-
-const createInputDiv = (inputType, classes, inputClasses, inputName, inputId) => {
-    let input = createInput(inputType, inputClasses, inputName, inputId);
-    return createWrap(input, classes);
-}
-
 const addIngredientFormFields = (container) => {
     /** Добавление полей для выбора ингридиента и его количества в формсет
      * (container). */
@@ -85,32 +60,61 @@ const addIngredientFormFields = (container) => {
     let index = +totalFormsInput.value;
 
     if (+totalFormsInput.value === +maxNumFormsInput.value) {
-        alert("Добавлено максимальное количество ингредиентов!");
+        $("#maxLimitError").modal({keyboard: true})
         return
     }
 
     // Создание элемента select для выбора ингридиентов и его подписи
-    let selectLabel = createLabelDiv("Ингредиент", "col-5");
-    let select = createSelectDiv("col-7", "form-control",
-        "dropdown-menu", `${INGREDIENT_FIELDS_PREFIX}-${index}-ingredient`,
-        `id_${INGREDIENT_FIELDS_PREFIX}-${index}-ingredient`);
-    let outerSelectWrap = createWrap([selectLabel, select],
+    let selectLabel = createHtmlElement("div", INGREDIENT_LABEL, {"classes": "col-12 col-sm-5"});
+    let select = createHtmlElement("select", "", {
+        "classes": "dropdown-menu",
+        "id": `id_${INGREDIENT_FIELDS_PREFIX}-${index}-ingredient`,
+        "attributes": [
+            ["name", `${INGREDIENT_FIELDS_PREFIX}-${index}-ingredient`],
+        ]
+    });
+    let option = createHtmlElement("option", "---------");
+    select.appendChild(option);
+    let innerSelectWrap = createWrap(select, "form-control select2-custom-container");
+    let selectWrap = createWrap(innerSelectWrap, "col-12 col-sm-7");
+    let outerSelectWrap = createWrap([selectLabel, selectWrap],
         "form-group row my-2");
+    // Создание блока с подсказкой для выбора ингредиентов
+    let selectHelpText = createHtmlElement("small", INGREDIENT_HELP_TEXT, {"classes": "form-text"});
+    let selectHelpTextWrap = createWrap(selectHelpText, "col-12 col-sm-7 offset-sm-5");
+
     // Создание элемента input для ввода количества ингридиентов и его подписи
-    let inputLabel = createLabelDiv("Количество", "col-5");
-    let input = createInputDiv("number", "col-7", "form-control",
-        `${INGREDIENT_FIELDS_PREFIX}-${index}-amount`,
-        `id_${INGREDIENT_FIELDS_PREFIX}-${index}-amount`);
-    let outerInputWrap = createWrap([inputLabel, input],
+    let inputLabel = createHtmlElement("div", AMOUNT_LABEL, {"classes": "col-5"});
+    let input = createHtmlElement("input", "", {
+        "classes": "form-control",
+        "id": `id_${INGREDIENT_FIELDS_PREFIX}-${index}-amount`,
+        "attributes": [
+            ["name", `${INGREDIENT_FIELDS_PREFIX}-${index}-amount`],
+            ["type", "number"],
+        ]
+    });
+    let innerInputWrap = createWrap(input, "col-7");
+    let outerInputWrap = createWrap([inputLabel, innerInputWrap],
         "form-group row my-2");
+
+    // Создание блока с подсказкой для выбора количества ингредиента
+    let inputHelpText = createHtmlElement("small", AMOUNT_HELP_TEXT, {"classes": "form-text"});
+    let inputHelpTextWrap = createWrap(inputHelpText, "col-12 col-sm-7 offset-sm-5");
+
     // Создание кнопки удаления
-    let button = document.createElement("a");
-    button.textContent="Удалить ингредиент";
-    addClasses(button, "btn btn-light remove-ingredient-button")
-    let buttonWrap = createWrap(button, "my-2 text-right");
+    let button = createHtmlElement("a", INGREDIENT_BTN_TEXT,
+        {"classes": "btn btn-light remove-ingredient-button d-block"});
+    let buttonInnerWrap = createWrap(button, "col col-sm-7 offset-sm-5")
+    let buttonWrap = createWrap(buttonInnerWrap, "row my-2 text-right");
+    button.addEventListener("click", event => {
+            event.preventDefault();
+            removeIngredientFormFields(event.target)
+        });
+
     // Общая обертка для полей выбора ингридиента, ввода его количества, кнопки
-    let wrap = createWrap([outerSelectWrap, outerInputWrap, buttonWrap],
-        "add-ingredient-container border my-2 p-2 border-light-rounded");
+    let wrap = createWrap([outerSelectWrap, selectHelpTextWrap,
+            outerInputWrap, inputHelpTextWrap, buttonWrap],
+        "add-ingredient-container border my-2 p-2 border-light rounded");
     wrap.id = `container-id_${INGREDIENT_FIELDS_PREFIX}-${index}-ingredient`;
 
     container.appendChild(wrap);
@@ -127,9 +131,11 @@ const changeIngredientIndex = (currentIndex, newIndex) => {
 
     const select = container.querySelector(
         `#id_${INGREDIENT_FIELDS_PREFIX}-${currentIndex}-ingredient`);
-    select.id = `#id_${INGREDIENT_FIELDS_PREFIX}-${newIndex}-ingredient`;
+    select.id = `id_${INGREDIENT_FIELDS_PREFIX}-${newIndex}-ingredient`;
+    select.setAttribute("name", `${INGREDIENT_FIELDS_PREFIX}-${newIndex}-ingredient`)
     select.setAttribute("data-select2-id",
         `select2-data-id_${INGREDIENT_FIELDS_PREFIX}-${newIndex}-ingredient`);
+
 
     const select2span = container.querySelector(".select2-selection");
     select2span.setAttribute("aria-labelledby",
@@ -149,16 +155,17 @@ const removeIngredientFormFields = (removeBtn) => {
     let minNumFormsInput = document.querySelector(`#id_${INGREDIENT_FIELDS_PREFIX}-MIN_NUM_FORMS`);
 
     if (+totalFormsInput.value <= +minNumFormsInput.value) {
-        alert(`Должно быть не менее ${+totalFormsInput.value} ингридиентов.`);
+        $("#minLimitError").modal({keyboard: true});
         return;
     }
 
     const container = removeBtn.closest(".add-ingredient-container");
     let index = +container.id.replace("container-id_ingredient-", "").replace("-ingredient", "");
     container.remove();
-    for (let i = index + 1; i < +totalFormsInput.value; i++)
+    for (let i = index + 1; i <= +totalFormsInput.value; i++)
         changeIngredientIndex(i, i - 1);
 
+    console.log("totalFormsInput.value:", totalFormsInput.value);
     totalFormsInput.value = +totalFormsInput.value - 1;
 }
 

@@ -100,6 +100,17 @@
             </form>
         </div>
     </div>
+
+    {% with modal_id="maxLimitError" modal_title="Слишком много ингредиентов" %}
+        {% with modal_text="Добавлено максимальное количество ингредиентов!" modal_btn_close="OK" %}
+            {% include "modals/alert.html" %}
+        {% endwith %}
+    {% endwith %}
+        {% with modal_id="minLimitError" modal_title="Слишком мало ингредиентов" %}
+        {% with modal_text="Ингридиентов не может быть меньше!" modal_btn_close="OK" %}
+            {% include "modals/alert.html" %}
+        {% endwith %}
+    {% endwith %}
 {% endblock %}
 
 {% block scripts %}
