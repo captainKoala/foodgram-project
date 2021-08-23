@@ -1,10 +1,8 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
-
 from rest_framework.routers import DefaultRouter
 
 from . import views
-
 
 router = DefaultRouter()
 
@@ -32,9 +30,11 @@ urlpatterns = [
 
     path("favorite/", views.favorite_recipes, name="web-favorite-recipes"),
     path("recipes/", views.recipes_list, name="web-recipes"),
-    path("recipes/<int:recipe_id>/", views.recipe_single, name="web-recipe-single"),
+    path("recipes/<int:recipe_id>/", views.recipe_single,
+         name="web-recipe-single"),
     path("recipes/create/", views.recipe_edit, name="web-recipe-create"),
-    path("recipes/<int:recipe_id>/edit/", views.recipe_edit, name="web-recipe-edit"),
+    path("recipes/<int:recipe_id>/edit/", views.recipe_edit,
+         name="web-recipe-edit"),
     path("recipes/<int:recipe_id>/remove/", views.recipe_remove,
          name="web-recipe-remove"),
     path("recipes/<int:recipe_id>/favorite/",

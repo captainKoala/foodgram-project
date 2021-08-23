@@ -21,10 +21,9 @@ from .models import (Ingredient, Recipe, RecipeFavourite,
                      UserFollow)
 from .permissions import IsAuthorOrIsStaffOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
-                          RecipeCreateSerializer,
-                          RecipeFavouriteSerializer, RecipeReadSerializer,
-                          ShoppingCartSerializer, TagSerializer,
-                          UserFollowSerializer)
+                          RecipeCreateSerializer, RecipeFavouriteSerializer,
+                          RecipeReadSerializer, ShoppingCartSerializer,
+                          TagSerializer, UserFollowSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):

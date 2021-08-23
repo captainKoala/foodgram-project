@@ -22,6 +22,3 @@ class UserAdmin(admin.ModelAdmin):
         else:
             obj.set_password(obj.password)
         obj.save()
-
-
-

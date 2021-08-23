@@ -1,6 +1,6 @@
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import get_user_model
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
 from api.models import Recipe, RecipeIngredientsDetails
 
@@ -11,7 +11,6 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("username", "first_name", "last_name", "email")
-
 
 
 IngredientsFormSet = forms.inlineformset_factory(

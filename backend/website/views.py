@@ -1,26 +1,24 @@
 import requests
-
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http.response import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic.base import TemplateView
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-
+from django.views.generic.base import TemplateView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from .forms import CustomUserCreationForm, IngredientsFormSet, RecipeCreateForm
 from api.models import Ingredient, Recipe, RecipeIngredientsDetails, Tag
 from api.views import (RecipeFavouriteViewSet, ShoppingCartViewSet,
                        SubscriptionsViewSet)
 from users.models import User
 
+from .forms import CustomUserCreationForm, IngredientsFormSet, RecipeCreateForm
 
 RECIPES_PER_PAGE = 6
 INGREDIENT_FORMSET_PREFIX = "ingredient"
@@ -167,7 +165,8 @@ def recipe_single(request, recipe_id):
     if request.user.is_anonymous:
         is_followed = False
     else:
-        is_followed = recipe.author.followers.filter(user=request.user).exists()
+        is_followed = (recipe.author.followers
+                       .filter(user=request.user).exists())
 
     context["recipe"] = recipe
     context["is_followed"] = is_followed
@@ -240,7 +239,8 @@ def recipe_edit(request, recipe_id=None):
             recipe.author_id = request.user.id
             recipe.save()
             form.save_m2m()
-            RecipeIngredientsDetails.objects.filter(recipe_id=recipe_id).delete()
+            (RecipeIngredientsDetails.objects
+             .filter(recipe_id=recipe_id).delete())
             formset.instance = recipe
             formset.save()
             return redirect(reverse_lazy("web-recipe-single",
@@ -273,7 +273,7 @@ def recipe_remove(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
     if (request.user != recipe.author and
-            not request.user.groups.filter(name="Администраторы").exists()):
+            not (request.user.groups.filter(name="Администраторы").exists())):
         return redirect(reverse_lazy("web-recipe-single",
                                      kwargs={"recipe_id": recipe_id}))
     recipe.delete()
@@ -319,7 +319,9 @@ def shopping_cart_remove(request, recipe_id):
     """Удаление рецепта из списка покупок и обновление списка ингредиентов."""
     from api.models import RecipeShoppingCart
 
-    cart_recipe = get_object_or_404(RecipeShoppingCart, recipe_id=recipe_id, user=request.user)
+    cart_recipe = get_object_or_404(RecipeShoppingCart,
+                                    recipe_id=recipe_id,
+                                    user=request.user)
     cart_recipe.delete()
     return redirect(reverse_lazy("web-shopping-cart"))
 
