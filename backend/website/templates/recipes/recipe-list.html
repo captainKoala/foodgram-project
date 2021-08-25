@@ -16,21 +16,21 @@
                         <h2 class="card-title">{{ recipe.name }}</h2>
                     </a>
                     <!-- список тегов -->
-                    {% include "recipe-tags-list.html" %}
+                    {% include "recipes/recipe-tags-list.html" %}
 
                     <!-- время приготовления -->
-                    {% include "recipe-cooking-time.html" %}
+                    {% include "recipes/recipe-cooking-time.html" %}
                     <!-- автор -->
-                        {% include "recipe-author.html" %}
+                        {% include "recipes/recipe-author.html" %}
                     {% if user.is_authenticated %}
                         <div class="row mt-4 align-self-end align-items-center">
                             <!-- кнопка добаления в список покупок -->
                             <div class="col-10">
-                                {% include "recipe-btn-add-to-shooping-cart.html" %}
+                                {% include "recipes/recipe-btn-add-to-shooping-cart.html" %}
                             </div>
                             <!-- кнопка добаления в избранное -->
                             <div class="col-2 text-right">
-                                {% include "recipe-btn-add-to-favorites.html" %}
+                                {% include "recipes/recipe-btn-add-to-favorites.html" %}
                             </div>
                         </div>
                     {% endif %}
@@ -45,4 +45,4 @@
 </div>
 
 {% load static %}
-<script src="{% static 'js/buttons.js'%}"></script>
+<script src="{% static 'js/buttons.js' %}"></script>

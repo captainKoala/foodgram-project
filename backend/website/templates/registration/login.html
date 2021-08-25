@@ -9,7 +9,7 @@
             <h1 class="col-md-6 text-center">Войти на сайт</h1>
         </div>
         <div class="row">
-            <form class="col-md-6 offset-md-3 border rounded my-5 p-5 shadow" method="post">
+            <form class="col-lg-6 col-md-10 offset-lg-3 offset-md-1 border rounded my-5 p-5 shadow" method="post">
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="form-group row">
@@ -48,8 +48,8 @@
                 </div>
                 <div class="form-group row mt-5">
                     <p><a href="{% url "web-recipes" %}">Посмотреть рецепты</a> без авторизации</p>
-                    <small><i>Вы не сможете добавлять рецепты в избранное и
-                        формировать список покупок, не авторизовавшись.</i></small>
+                    <small><i>Вы не сможете создавать новые рецепты, добавлять рецепты других пользователей в избранное
+                        и формировать список покупок, не авторизовавшись.</i></small>
                 </div>
             </form>
         </div>

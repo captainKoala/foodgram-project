@@ -1,5 +1,7 @@
 from django import template
 
+from api.models import RecipeFavourite, RecipeShoppingCart
+
 register = template.Library()
 
 
@@ -22,3 +24,13 @@ def filter_class(field, cls_prefix):
                                if c.startswith(cls_prefix))
             field["attrs"]["class"] = classes
     return field
+
+
+@register.filter()
+def is_recipe_in_shopping_cart(recipe, user):
+    return RecipeShoppingCart.objects.filter(recipe=recipe, user=user).exists()
+
+
+@register.filter()
+def is_recipe_in_favorites(recipe, user):
+    return RecipeFavourite.objects.filter(recipe=recipe, user=user).exists()

@@ -44,7 +44,7 @@
                                 <a href="{% url 'web-author-page' author_id=author.id %}">Еще {{ author.recipes_count|add:-3 }} рецептов...</a>
                             {% endif %}
                             <div class="text-center mt-3">
-                                {% include "recipe-btn-follow-author.html" with is_followed=True authorid=author.id %}
+                                {% include "recipes/recipe-btn-follow-author.html" with is_followed=True authorid=author.id %}
                             </div>
                         </div>
                     </div>

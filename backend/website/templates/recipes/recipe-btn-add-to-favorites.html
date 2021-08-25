@@ -1,22 +1,23 @@
 <!-- кнопка добаления в избранное -->
 <!-- для использования необходимо подключить buttons.js -->
-<div class="my-2">
-{#    {{ recipe }}#}
-{#    {{ favorite_recipes }}#}
-    <a href="#"
-       title="Удалить из избранного"
-       class="in-favorite {% if recipe not in favorite_recipes %}d-none{% else %}d-block{% endif %}"
-       id="remove-from-favorite-{{ recipe.id }}"
-       data-recipeid="{{ recipe.id }}"
-       data-is_selected="true">
-        {% include "icons/star-fill.svg" %}
-    </a>
-    <a href="#"
-       title="Добавить в избранное"
-       class="in-favorite {% if recipe in favorite_recipes %}d-none{% else %}d-block{% endif %}"
-       id="add-to-favorite-{{ recipe.id }}"
-       data-recipeid="{{ recipe.id }}"
-       data-is_selected="false">
-        {% include "icons/star.svg" %}
-    </a>
-</div>
+{% load website_filters %}
+{% with is_favorite=recipe|is_recipe_in_favorites:request.user %}
+    <div class="my-2">
+        <a href="#"
+           title="Удалить из избранного"
+           class="in-favorite {% if not is_favorite %}d-none{% else %}d-block{% endif %}"
+           id="remove-from-favorite-{{ recipe.id }}"
+           data-recipeid="{{ recipe.id }}"
+           data-is_selected="true">
+            {% include "icons/star-fill.svg" %}
+        </a>
+        <a href="#"
+           title="Добавить в избранное"
+           class="in-favorite {% if is_favorite %}d-none{% else %}d-block{% endif %}"
+           id="add-to-favorite-{{ recipe.id }}"
+           data-recipeid="{{ recipe.id }}"
+           data-is_selected="false">
+            {% include "icons/star.svg" %}
+        </a>
+    </div>
+{% endwith %}

@@ -18,7 +18,8 @@ from api.views import (RecipeFavouriteViewSet, ShoppingCartViewSet,
                        SubscriptionsViewSet)
 from users.models import User
 
-from .forms import CustomUserCreationForm, IngredientsFormSet, RecipeCreateForm
+from .forms import (CustomUserCreationForm, IngredientsFormSet,
+                    RecipeCreateForm, UserEditForm)
 
 RECIPES_PER_PAGE = 6
 INGREDIENT_FORMSET_PREFIX = "ingredient"
@@ -91,6 +92,22 @@ class ActivateUser(GenericAPIView):
                       template_name="register/email_confirm_error.html")
 
 
+@login_required(login_url=reverse_lazy("web-login"))
+def edit_user(request):
+    """Редактирование информации о пользователе."""
+    if request.method == "POST":
+        form = UserEditForm(data=request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect(
+                reverse_lazy("web-author-page",
+                             kwargs={"author_id": request.user.id}))
+    form = UserEditForm(instance=request.user)
+    context = {"form": form}
+    return render(request, context=context,
+                  template_name="user_info_change_form.html")
+
+
 class CustomPasswordChangeView(auth_views.PasswordChangeView):
     """Смена пароля."""
     template_name = "register/password_change_form.html"
@@ -139,15 +156,8 @@ def create_context(request):
     if not selected_tags:
         selected_tags = tuple(tag.slug for tag in tags)
 
-    shopping_cart = favorite = 0
-    if request.user.is_authenticated:
-        shopping_cart = Recipe.objects.filter(to_shopping__user=request.user)
-        favorite = Recipe.objects.filter(favourites__user=request.user)
-
     return {
-        "favorite_recipes": favorite,
         "selected_tags": selected_tags,
-        "shopping_cart": shopping_cart,
         "tags": tags,
     }
 
@@ -198,7 +208,8 @@ def recipes_list(request):
     page_number = request.GET.get("page")
     context["recipes"] = paginator.get_page(page_number)
     context["title"] = "Рецепты"
-    return render(request, context=context, template_name="recipes.html")
+    return render(request, context=context,
+                  template_name="recipes/recipes.html")
 
 
 @login_required(login_url=reverse_lazy("web-login"))
@@ -206,9 +217,7 @@ def favorite_recipes(request):
     """Страница с избранными рецептами."""
     context = create_context(request)
 
-    recipes = (Recipe.objects.none()
-               if "__none__" in context["selected_tags"] else
-               context["favorite_recipes"]
+    recipes = (Recipe.objects.filter(favourites__user=request.user)
                .filter(tags__slug__in=context["selected_tags"])
                .distinct().order_by("-pub_date"))
 
@@ -216,7 +225,8 @@ def favorite_recipes(request):
     page_number = request.GET.get("page")
     context["recipes"] = paginator.get_page(page_number)
     context["title"] = "Избранное"
-    return render(request, context=context, template_name="recipes.html")
+    return render(request, context=context,
+                  template_name="recipes/recipes.html")
 
 
 @login_required(login_url=reverse_lazy("web-login"))
@@ -259,7 +269,7 @@ def recipe_edit(request, recipe_id=None):
                                          kwargs={"recipe_id": recipe.id}))
         context = {"form": form, "formset": formset, "title": title,
                    "button_text": button_text, }
-        return render(request, template_name="recipe-create.html",
+        return render(request, template_name="recipes/recipe-create.html",
                       context=context)
 
     form = RecipeCreateForm(instance=recipe)
@@ -276,7 +286,8 @@ def recipe_edit(request, recipe_id=None):
         "button_text": button_text,
     }
 
-    return render(request, context=context, template_name="recipe-create.html")
+    return render(request, context=context,
+                  template_name="recipes/recipe-create.html")
 
 
 @login_required(login_url=reverse_lazy("web-login"))

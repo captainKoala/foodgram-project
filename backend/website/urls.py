@@ -55,6 +55,7 @@ urlpatterns = [
          views.WebsiteSubscriptionsViewSet.as_view(
              {"get": "create", "delete": "destroy"}),
          name="web-subscribe"),
+    path("users/profile_edit/", views.edit_user, name="web-profile-edit"),
     path("users/subscriptions/",
          views.WebsiteSubscriptionsViewSet.as_view({"get": "list"}),
          name="web-subscriptions"),

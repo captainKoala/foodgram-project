@@ -1,14 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Регистрация{% endblock %}
+
+{% block title %}Редактирование профиля{% endblock %}
+
 {% block main %}
     <div class="container">
         <div class="row mt-5 mb-2 justify-content-center">
-            <h1 class="col-md-6">Регистрация</h1>
+            <h1 class="col-md-6">Редактирование профиля</h1>
         </div>
         <div class="row">
             <form class="col-md-10 col-lg-6 offset-md-1 offset-lg-3 border rounded my-5 p-5 shadow"
                   method="post"
-                  action="{% url 'signup' %}">
+                  action="{% url 'web-profile-edit' %}">
                 {% csrf_token %}
                 {% load website_filters %}
                 {% for field in form %}
@@ -32,7 +34,7 @@
                     {% endif %}
                 {% endfor %}
                 <div class="form-group row d-flex justify-content-center align-items-center">
-                    <button type="submit" class="btn block-darkstyle mx-3">Зарегистрироваться</button>
+                    <button type="submit" class="btn block-darkstyle mx-3">Сохранить изменения</button>
                 </div>
             </form>
         </div>

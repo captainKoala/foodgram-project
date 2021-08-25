@@ -29,19 +29,23 @@
                             <a class="nav-link m-auto text-center"
                                href="{% url 'web-favorite-recipes' %}">
                                 Избранное
-                                <span class="favorites-count badge badge-secondary py-1 px-2
-                                    {% if not favorite_recipes %}d-none{% endif %}">
-                                    {{ favorite_recipes.count }}
-                                </span>
+                                {% with favourites_count=request.user.recipe_favourites.count %}
+                                    <span class="favorites-count badge badge-secondary py-1 px-2
+                                        {% if not favourites_count %}d-none{% endif %}">
+                                            {{ favourites_count }}
+                                    </span>
+                                {% endwith %}
                             </a>
                         </li>
                         <li class="nav-item m-auto text-center">
                             <a class="nav-link"
                                href="{% url 'web-shopping-cart' %}">Покупки
-                                <span class="shopping-cart-count badge badge-secondary py-1 px-2
-                                    {% if not shopping_cart %}d-none{% endif %}">
-                                        {{ shopping_cart.count }}
-                                </span>
+                                {% with shopping_cart=request.user.shopping_cart.count %}
+                                    <span class="shopping-cart-count badge badge-secondary py-1 px-2
+                                        {% if not shopping_cart %}d-none{% endif %}">
+                                            {{ shopping_cart }}
+                                    </span>
+                                {% endwith %}
                             </a>
                         </li>
                         {% if request.user.is_staff %}

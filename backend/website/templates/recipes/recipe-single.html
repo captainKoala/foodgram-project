@@ -19,7 +19,7 @@
                     <div class="row">
                         <div class="col-12">
                             <!-- добавить в покупки -->
-                            {% include "recipe-btn-add-to-shooping-cart.html" %}
+                            {% include "recipes/recipe-btn-add-to-shooping-cart.html" %}
                         </div>
                         {% if user.id == recipe.author.id or user.is_staff %}
                             <div class="col-12">
@@ -43,28 +43,28 @@
                 <div class="row">
                     <div class="col-10">
                         <!-- список тегов -->
-                        {% include "recipe-tags-list.html" %}
+                        {% include "recipes/recipe-tags-list.html" %}
                     </div>
                     {% if request.user.is_authenticated %}
                         <div class="col-2">
                             <!-- кнопка избранного -->
-                            {% include "recipe-btn-add-to-favorites.html" %}
+                            {% include "recipes/recipe-btn-add-to-favorites.html" %}
                         </div>
                     {% endif %}
                 </div>
                 <!-- время приготовления -->
                 <div class="mt-4">
-                    {% include "recipe-cooking-time.html" %}
+                    {% include "recipes/recipe-cooking-time.html" %}
                 </div>
                 <!-- автор -->
                 <div class="row">
                     <div class="col-12 col-md-6 mt-4">
-                        {% include "recipe-author.html" %}
+                        {% include "recipes/recipe-author.html" %}
                     </div>
                     <!-- кнопка подписки -->
                     {% if user.is_authenticated %}
                         <div class="col-12 col-md-6 mt-4">
-                            {% include "recipe-btn-follow-author.html" with authorid=recipe.author.id%}
+                            {% include "recipes/recipe-btn-follow-author.html" with authorid=recipe.author.id%}
                         </div>
                     {% endif %}
                 </div>
