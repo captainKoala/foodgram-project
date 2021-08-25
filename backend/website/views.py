@@ -192,7 +192,8 @@ def recipe_single(request, recipe_id):
 
     context["recipe"] = recipe
     context["is_followed"] = is_followed
-    return render(request, context=context, template_name="recipe-single.html")
+    return render(request, context=context,
+                  template_name="recipes/recipe-single.html")
 
 
 def recipes_list(request):
