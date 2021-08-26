@@ -4,7 +4,8 @@
             <nav class="col">
                 <ul class="pagination justify-content-center my-4"
                     data-num-pages="{{ page.paginator.num_pages }}"
-                    data-current-page="{{ page.number }}">
+                    data-current-page="{{ page.number }}"
+                    data-params="{% for tag in selected_tags %}tags={{ tag }}{% if not forloop.last %}&{% endif %}{% endfor %}" >
                 </ul>
             </nav>
         </div>

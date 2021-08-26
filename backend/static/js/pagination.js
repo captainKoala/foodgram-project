@@ -1,12 +1,12 @@
 const LINKS_PER_PAGINATOR = 5;
 
 const createPaginatorItem = (pageNumber, isActive=false, isDisabled=false,
-                             itemText="", url="") => {
+                             itemText="", url="", params="") => {
     /**
      * Создает элемент паджинатора li со ссылкой.
      * Возвращает соответствующий HTML-элемент.
      */
-
+    console.log(params)
     let li = document.createElement("li");
     let a = document.createElement("a");
 
@@ -18,7 +18,7 @@ const createPaginatorItem = (pageNumber, isActive=false, isDisabled=false,
         li.classList.add("disabled");
 
     a.classList.add("page-link");
-    a.href = url ? url : `?page=${pageNumber}`;
+    a.href = url ? url : `?page=${pageNumber}&${params}`;
     a.textContent = itemText ? itemText : pageNumber;
 
     li.appendChild(a);
@@ -32,15 +32,16 @@ document.addEventListener("DOMContentLoaded", event => {
     {
         const numPages = +paginator.dataset.numPages;
         const currentPage = +paginator.dataset.currentPage;
+        let params = paginator.dataset.params;
 
         if (!numPages || !currentPage)
             return;
 
         if (numPages > LINKS_PER_PAGINATOR)
             paginator.appendChild(createPaginatorItem(1, false,
-                currentPage === 1, "<<"));
+                currentPage === 1, "<<", "", params));
         paginator.appendChild(createPaginatorItem(currentPage - 1, false,
-            currentPage === 1, "<"));
+            currentPage === 1, "<", "", params));
 
         let startPageNumber = currentPage - Math.floor(LINKS_PER_PAGINATOR/2);
         let endPageNumber = currentPage + Math.floor((LINKS_PER_PAGINATOR-1)/2);
@@ -55,19 +56,18 @@ document.addEventListener("DOMContentLoaded", event => {
         while (endPageNumber - startPageNumber + 1 < LINKS_PER_PAGINATOR && startPageNumber > 1)
             startPageNumber--;
 
-
         for (let i = startPageNumber; i <= endPageNumber; i++) {
             paginator.appendChild(
                 createPaginatorItem(i, i === currentPage, false, false,
-                    i === currentPage ? "#" : ""));
+                    i === currentPage ? "#" : "", params));
         }
 
         paginator.appendChild(
             createPaginatorItem(currentPage + 1, false,
-                currentPage === numPages, ">"));
+                currentPage === numPages, ">", "", params));
         if (numPages > LINKS_PER_PAGINATOR)
             paginator.appendChild(
                 createPaginatorItem(numPages, false,
-                    currentPage === numPages, ">>"));
+                    currentPage === numPages, ">>", "", params));
     }
 })
